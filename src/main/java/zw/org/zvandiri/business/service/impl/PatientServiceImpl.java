@@ -25,24 +25,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import zw.org.zvandiri.business.domain.ArvHist;
-import zw.org.zvandiri.business.domain.CatDetail;
-import zw.org.zvandiri.business.domain.ChronicInfectionItem;
-import zw.org.zvandiri.business.domain.Contact;
-import zw.org.zvandiri.business.domain.Dependent;
-import zw.org.zvandiri.business.domain.EidTest;
-import zw.org.zvandiri.business.domain.Family;
-import zw.org.zvandiri.business.domain.HivConInfectionItem;
-import zw.org.zvandiri.business.domain.InvestigationTest;
-import zw.org.zvandiri.business.domain.MedicalHist;
-import zw.org.zvandiri.business.domain.MentalHealthItem;
-import zw.org.zvandiri.business.domain.ObstercHist;
-import zw.org.zvandiri.business.domain.Patient;
-import zw.org.zvandiri.business.domain.PatientDisability;
-import zw.org.zvandiri.business.domain.Referral;
-import zw.org.zvandiri.business.domain.SocialHist;
-import zw.org.zvandiri.business.domain.SrhHist;
-import zw.org.zvandiri.business.domain.SubstanceItem;
+import zw.org.zvandiri.business.domain.*;
 import zw.org.zvandiri.business.domain.util.PatientChangeEvent;
 import zw.org.zvandiri.business.domain.util.YesNo;
 import zw.org.zvandiri.business.repo.PatientRepo;
@@ -425,6 +408,16 @@ public class PatientServiceImpl implements PatientService {
             mobilePatientDTOS.add(new MobilePatientDTO(p));
         }*/
         return patients;
+    }
+
+    @Override
+    public List<Patient> getActiveByDistrict(District district) {
+        return patientRepo.getActiveByDistrict(district);
+    }
+
+    @Override
+    public List<Patient> getActiveByProvince(Province province) {
+        return  patientRepo.getActiveByProvince(province);
     }
 
 

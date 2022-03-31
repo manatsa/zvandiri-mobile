@@ -100,10 +100,21 @@ public class MobilePatientResource {
 
     @GetMapping("/initial-statics")
     public MobileStaticsDTO getCatPatients(@RequestParam("email") String email) {
-        CatDetail catDetail = catDetailService.getByEmail(email);
+        long start=System.currentTimeMillis();
+        List<Patient> patients=new ArrayList<>();
         MobileStaticsDTO mobileStaticsDTO = new MobileStaticsDTO();
+        User logUser=userService.findByUserName(email);
+        if(logUser.getUserLevel()==null ||logUser.getUserLevel().equals(UserLevel.FACILITY)){
+            CatDetail catDetail = catDetailService.getByEmail(email);
+            patients = patientService.getFacilityPatients(catDetail);
+        }else if(logUser.getUserLevel().equals(UserLevel.DISTRICT)){
+            patients=patientService.getActiveByDistrict(logUser.getDistrict());
+        }else if(logUser.getUserLevel().equals(UserLevel.PROVINCE)){
+            patients=patientService.getActiveByProvince(logUser.getProvince());
+        }else{
+            patients=patientService.getAll();
+        }
 
-        List<Patient> patients = patientService.getFacilityPatients(catDetail);
         List<PatientListDTO> patientListDTOS=new ArrayList<>();
         for(Patient patient: patients){
             patientListDTOS.add(new PatientListDTO(patient));
@@ -190,8 +201,11 @@ public class MobilePatientResource {
         mobileStaticsDTO.setUser(userService.getCurrentUser());
         mobileStaticsDTO.setLocations(locationDTOS);
         mobileStaticsDTO.setPositions(positionDTOS);
-
-        System.err.println("<= User :" + email + " => Statics,********, User : "+userService.getCurrentUsername()+" <> "+patients.size()+" patients retrieved");
+        long end = System.currentTimeMillis();
+        long time=(end-start)/(60000);
+        String timeTaken=time<120 ? time+" mins": ((double)Math.round(time/60))+" hrs";
+        System.err.println("<= User::" + email + " => Statics,********, User : "+userService.getCurrentUsername()+" <> "+
+                patients.size()+" patients retrieved ******** Time Taken:: "+timeTaken);
 
         return mobileStaticsDTO;
     }

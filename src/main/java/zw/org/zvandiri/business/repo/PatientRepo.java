@@ -137,5 +137,11 @@ public interface PatientRepo extends JpaRepository<Patient, String> {
 
     public  List<Patient> getAllByPrimaryClinicAndActive(@Param("facility") Facility primaryClinic, @Param("active") boolean active);
 
+    @Query("select distinct p from Patient p where p.primaryClinic.district=:district and p.active=true and p.status=5")
+    List<Patient> getActiveByDistrict(@Param("district") District district);
+
+    @Query("select distinct p from Patient p where p.active=true and p.status=5 and p.primaryClinic.district.province=:province")
+    List<Patient> getActiveByProvince(@Param("province") Province province);
+
     
 }

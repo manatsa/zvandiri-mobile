@@ -17,8 +17,12 @@ package zw.org.zvandiri.business.service;
 
 import java.util.List;
 import java.util.Set;
+
+import org.springframework.data.repository.query.Param;
 import zw.org.zvandiri.business.domain.CatDetail;
+import zw.org.zvandiri.business.domain.District;
 import zw.org.zvandiri.business.domain.Patient;
+import zw.org.zvandiri.business.domain.Province;
 import zw.org.zvandiri.business.util.dto.MobilePatientDTO;
 import zw.org.zvandiri.business.util.dto.NameIdDTO;
 import zw.org.zvandiri.business.util.dto.PatientDuplicateDTO;
@@ -53,4 +57,8 @@ public interface PatientService extends GenericService<Patient> {
     public List<NameIdDTO> getCatPatients(CatDetail catdDetail);
 
     public List<Patient> getFacilityPatients(CatDetail catdDetail);
+
+    List<Patient> getActiveByDistrict(District district);
+
+    List<Patient> getActiveByProvince(Province province);
 }
