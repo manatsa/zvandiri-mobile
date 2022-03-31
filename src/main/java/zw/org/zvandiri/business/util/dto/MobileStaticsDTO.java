@@ -2,6 +2,7 @@ package zw.org.zvandiri.business.util.dto;
 
 
 import zw.org.zvandiri.business.domain.*;
+import zw.org.zvandiri.business.domain.dto.*;
 import zw.org.zvandiri.business.service.LabTaskService;
 
 import java.io.Serializable;
@@ -13,26 +14,38 @@ import java.util.List;
 
 
 public class MobileStaticsDTO implements Serializable {
-    List<Patient> patients;
-    List<District> districts;
-    List<Province> provinces;
+    List<PatientListDTO> patients;
+    List<DistrictDTO> districts;
+    List<ProvinceDTO> provinces;
+    List<FacilityDTO> facilities;
     List<SupportGroup> supportGroups;
     List<Relationship> relationships;
     List<Referer> referers;
     List<OrphanStatus> orphanStatuses;
     List<Education> educations;
     List<EducationLevel> educationLevels;
-    List<Location> locations;
-    List<Position> positions;
-    List<InternalReferral> internalReferrals;
-    List<ExternalReferral> externalReferrals;
+    List<LocationDTO> locations;
+    List<PositionDTO> positions;
     List<ChronicInfection> chronicInfections;
-    List<ServiceOffered> serviceOffereds;
-    List<ServicesReferred> servicesReferred;
+    List<ServiceOfferredDTO> serviceOffereds;
+    List<ServiceReferredDTO> hivStiServicesReq;
+    List<ServiceReferredDTO> hivStiServicesAvailed;
+    List<ServiceReferredDTO> oiArtReq;
+    List<ServiceReferredDTO> oiArtAvailed;
+    List<ServiceReferredDTO> srhReq;
+    List<ServiceReferredDTO> srhAvailed;
+    List<ServiceReferredDTO> laboratoryReq;
+    List<ServiceReferredDTO> laboratoryAvailed;
+    List<ServiceReferredDTO>tbReq;
+    List<ServiceReferredDTO> tbAvailed;
+    List<ServiceReferredDTO> psychReq;
+    List<ServiceReferredDTO> psychAvailed;
+    List<ServiceReferredDTO> legalReq;
+    List<ServiceReferredDTO> legalAvailed;
     List<HivCoInfection> hivCoInfections;
     List<MentalHealth> mentalHealths;
     List<DisabilityCategory> disabilityCategories;
-    List<Assessment> assessments;
+    List<AssessmentDTO> assessments;
     List<ArvMedicine> arvMedicines;
     List<HospCause> hospCauses;
     List<Substance> substances;
@@ -41,28 +54,39 @@ public class MobileStaticsDTO implements Serializable {
     User user;
     List<LabTaskService> labTaskServices;
 
-    public List<Patient> getPatients() {
+    public MobileStaticsDTO() {
+    }
+
+    public List<PatientListDTO> getPatients() {
         return patients;
     }
 
-    public void setPatients(List<Patient> patients) {
+    public void setPatients(List<PatientListDTO> patients) {
         this.patients = patients;
     }
 
-    public List<District> getDistricts() {
+    public List<DistrictDTO> getDistricts() {
         return districts;
     }
 
-    public void setDistricts(List<District> districts) {
+    public void setDistricts(List<DistrictDTO> districts) {
         this.districts = districts;
     }
 
-    public List<Province> getProvinces() {
+    public List<ProvinceDTO> getProvinces() {
         return provinces;
     }
 
-    public void setProvinces(List<Province> provinces) {
+    public void setProvinces(List<ProvinceDTO> provinces) {
         this.provinces = provinces;
+    }
+
+    public List<FacilityDTO> getFacilities() {
+        return facilities;
+    }
+
+    public void setFacilities(List<FacilityDTO> facilities) {
+        this.facilities = facilities;
     }
 
     public List<SupportGroup> getSupportGroups() {
@@ -113,36 +137,20 @@ public class MobileStaticsDTO implements Serializable {
         this.educationLevels = educationLevels;
     }
 
-    public List<Location> getLocations() {
+    public List<LocationDTO> getLocations() {
         return locations;
     }
 
-    public void setLocations(List<Location> locations) {
+    public void setLocations(List<LocationDTO> locations) {
         this.locations = locations;
     }
 
-    public List<Position> getPositions() {
+    public List<PositionDTO> getPositions() {
         return positions;
     }
 
-    public void setPositions(List<Position> positions) {
+    public void setPositions(List<PositionDTO> positions) {
         this.positions = positions;
-    }
-
-    public List<InternalReferral> getInternalReferrals() {
-        return internalReferrals;
-    }
-
-    public void setInternalReferrals(List<InternalReferral> internalReferrals) {
-        this.internalReferrals = internalReferrals;
-    }
-
-    public List<ExternalReferral> getExternalReferrals() {
-        return externalReferrals;
-    }
-
-    public void setExternalReferrals(List<ExternalReferral> externalReferrals) {
-        this.externalReferrals = externalReferrals;
     }
 
     public List<ChronicInfection> getChronicInfections() {
@@ -153,20 +161,124 @@ public class MobileStaticsDTO implements Serializable {
         this.chronicInfections = chronicInfections;
     }
 
-    public List<ServiceOffered> getServiceOffereds() {
+    public List<ServiceOfferredDTO> getServiceOffereds() {
         return serviceOffereds;
     }
 
-    public void setServiceOffereds(List<ServiceOffered> serviceOffereds) {
+    public void setServiceOffereds(List<ServiceOfferredDTO> serviceOffereds) {
         this.serviceOffereds = serviceOffereds;
     }
 
-    public List<ServicesReferred> getServicesReferred() {
-        return servicesReferred;
+    public List<ServiceReferredDTO> getHivStiServicesReq() {
+        return hivStiServicesReq;
     }
 
-    public void setServicesReferred(List<ServicesReferred> servicesReferred) {
-        this.servicesReferred = servicesReferred;
+    public void setHivStiServicesReq(List<ServiceReferredDTO> hivStiServicesReq) {
+        this.hivStiServicesReq = hivStiServicesReq;
+    }
+
+    public List<ServiceReferredDTO> getHivStiServicesAvailed() {
+        return hivStiServicesAvailed;
+    }
+
+    public void setHivStiServicesAvailed(List<ServiceReferredDTO> hivStiServicesAvailed) {
+        this.hivStiServicesAvailed = hivStiServicesAvailed;
+    }
+
+    public List<ServiceReferredDTO> getOiArtReq() {
+        return oiArtReq;
+    }
+
+    public void setOiArtReq(List<ServiceReferredDTO> oiArtReq) {
+        this.oiArtReq = oiArtReq;
+    }
+
+    public List<ServiceReferredDTO> getOiArtAvailed() {
+        return oiArtAvailed;
+    }
+
+    public void setOiArtAvailed(List<ServiceReferredDTO> oiArtAvailed) {
+        this.oiArtAvailed = oiArtAvailed;
+    }
+
+    public List<ServiceReferredDTO> getSrhReq() {
+        return srhReq;
+    }
+
+    public void setSrhReq(List<ServiceReferredDTO> srhReq) {
+        this.srhReq = srhReq;
+    }
+
+    public List<ServiceReferredDTO> getSrhAvailed() {
+        return srhAvailed;
+    }
+
+    public void setSrhAvailed(List<ServiceReferredDTO> srhAvailed) {
+        this.srhAvailed = srhAvailed;
+    }
+
+    public List<ServiceReferredDTO> getLaboratoryReq() {
+        return laboratoryReq;
+    }
+
+    public void setLaboratoryReq(List<ServiceReferredDTO> laboratoryReq) {
+        this.laboratoryReq = laboratoryReq;
+    }
+
+    public List<ServiceReferredDTO> getLaboratoryAvailed() {
+        return laboratoryAvailed;
+    }
+
+    public void setLaboratoryAvailed(List<ServiceReferredDTO> laboratoryAvailed) {
+        this.laboratoryAvailed = laboratoryAvailed;
+    }
+
+    public List<ServiceReferredDTO> getTbReq() {
+        return tbReq;
+    }
+
+    public void setTbReq(List<ServiceReferredDTO> tbReq) {
+        this.tbReq = tbReq;
+    }
+
+    public List<ServiceReferredDTO> getTbAvailed() {
+        return tbAvailed;
+    }
+
+    public void setTbAvailed(List<ServiceReferredDTO> tbAvailed) {
+        this.tbAvailed = tbAvailed;
+    }
+
+    public List<ServiceReferredDTO> getPsychReq() {
+        return psychReq;
+    }
+
+    public void setPsychReq(List<ServiceReferredDTO> psychReq) {
+        this.psychReq = psychReq;
+    }
+
+    public List<ServiceReferredDTO> getPsychAvailed() {
+        return psychAvailed;
+    }
+
+    public void setPsychAvailed(List<ServiceReferredDTO> psychAvailed) {
+        this.psychAvailed = psychAvailed;
+    }
+
+    public List<ServiceReferredDTO> getLegalReq() {
+        return legalReq;
+    }
+
+    public void setLegalReq(List<ServiceReferredDTO> legalReq) {
+        this.legalReq = legalReq;
+    }
+
+    public List<ServiceReferredDTO> getLegalAvailed() {
+        return legalAvailed;
+    }
+
+    public void setLegalAvailed(List<ServiceReferredDTO> legalAvailed) {
+        this.legalAvailed = legalAvailed;
     }
 
     public List<HivCoInfection> getHivCoInfections() {
@@ -193,11 +305,11 @@ public class MobileStaticsDTO implements Serializable {
         this.disabilityCategories = disabilityCategories;
     }
 
-    public List<Assessment> getAssessments() {
+    public List<AssessmentDTO> getAssessments() {
         return assessments;
     }
 
-    public void setAssessments(List<Assessment> assessments) {
+    public void setAssessments(List<AssessmentDTO> assessments) {
         this.assessments = assessments;
     }
 
@@ -245,8 +357,8 @@ public class MobileStaticsDTO implements Serializable {
         return user;
     }
 
-    public void setUser(User users) {
-        this.user = users;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public List<LabTaskService> getLabTaskServices() {
@@ -255,37 +367,5 @@ public class MobileStaticsDTO implements Serializable {
 
     public void setLabTaskServices(List<LabTaskService> labTaskServices) {
         this.labTaskServices = labTaskServices;
-    }
-
-    @Override
-    public String toString() {
-        return "MobileStaticsDTO{" +
-                "patients=" + patients.toString() +
-                ", districts=" + districts.toString() +
-                ", provinces=" + provinces.toString() +
-                ", supportGroups=" + supportGroups +
-                ", relationships=" + relationships +
-                ", referers=" + referers +
-                ", orphanStatuses=" + orphanStatuses +
-                ", educations=" + educations +
-                ", educationLevels=" + educationLevels +
-                ", locations=" + locations +
-                ", positions=" + positions +
-                ", internalReferrals=" + internalReferrals +
-                ", externalReferrals=" + externalReferrals +
-                ", chronicInfections=" + chronicInfections +
-                ", serviceOffereds=" + serviceOffereds +
-                ", hivCoInfections=" + hivCoInfections +
-                ", mentalHealths=" + mentalHealths +
-                ", disabilityCategories=" + disabilityCategories +
-                ", assessments=" + assessments +
-                ", arvMedicines=" + arvMedicines +
-                ", hospCauses=" + hospCauses +
-                ", substances=" + substances +
-                ", actionTakens=" + actionTakens +
-                ", reasonForNotReachingOLevels=" + reasonForNotReachingOLevels +
-                ", user=" + user +
-                ", labTaskServices=" + labTaskServices +
-                '}';
     }
 }

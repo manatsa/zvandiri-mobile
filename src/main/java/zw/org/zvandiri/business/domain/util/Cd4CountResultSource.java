@@ -36,6 +36,9 @@ public enum Cd4CountResultSource {
     }
     
     public static Cd4CountResultSource get(Integer code){
+        if(code ==null){
+            return null;
+        }
         switch(code){
             case 1:
                 return SELF_REPORT;

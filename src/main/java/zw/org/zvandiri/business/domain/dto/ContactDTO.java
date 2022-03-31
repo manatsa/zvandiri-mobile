@@ -41,11 +41,8 @@ public class ContactDTO {
     private ContactPhoneOption contactPhoneOption;
     private Integer numberOfSms;
     private String position;
-    //@ElementCollection
     private Set<String> clinicalAssessments = new HashSet<>();
-    //@ElementCollection
     private Set<String> nonClinicalAssessments = new HashSet<>();
-    //@ElementCollection
     private Set<String> serviceOffereds = new HashSet<>();
     private Set<String> servicereferreds = new HashSet<>();
     @Temporal(TemporalType.DATE)

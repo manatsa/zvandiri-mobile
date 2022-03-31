@@ -37,6 +37,7 @@ import lombok.ToString;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import zw.org.zvandiri.business.domain.dto.ReferralDTO;
 import zw.org.zvandiri.business.domain.util.ReferralActionTaken;
 import zw.org.zvandiri.business.domain.util.YesNo;
 
@@ -53,7 +54,7 @@ import zw.org.zvandiri.business.domain.util.YesNo;
 public class Referral extends BaseEntity {
 
     @ManyToOne
-    @JoinColumn(name="patient", updatable = false, insertable = false)
+    @JoinColumn(name="patient")
     private Patient patient;
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd/MM/yyyy")
@@ -170,6 +171,16 @@ public class Referral extends BaseEntity {
 
     public Referral(Patient patient) {
         this.patient = patient;
+    }
+
+    public Referral(ReferralDTO referralDTO) {
+        this.referralDate = referralDTO.getReferralDate();
+        this.expectedVisitDate = referralDTO.getExpectedVisitDate();
+        this.organisation = referralDTO.getOrganisation();
+        this.designation = referralDTO.getDesignation();
+        this.attendingOfficer = referralDTO.getAttendingOfficer();
+        this.dateAttended = referralDTO.getDateAttended();
+
     }
 
     public Patient getPatient() {

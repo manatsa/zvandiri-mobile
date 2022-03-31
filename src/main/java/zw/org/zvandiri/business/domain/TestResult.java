@@ -36,7 +36,7 @@ public class TestResult extends BaseEntity {
     @ManyToOne
     @NotNull
     //@JsonIgnore
-    @JoinColumn(name="patient", updatable = false, insertable = false)
+    @JoinColumn(name="patient")
     private Patient patient;
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd/MM/yyyy")
@@ -53,6 +53,7 @@ public class TestResult extends BaseEntity {
 
     public TestResult() {
     }
+
 
     public TestResult(Patient patient) {
         this.patient = patient;

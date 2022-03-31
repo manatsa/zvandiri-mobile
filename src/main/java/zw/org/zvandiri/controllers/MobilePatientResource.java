@@ -9,10 +9,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import zw.org.zvandiri.business.domain.*;
-import zw.org.zvandiri.business.domain.dto.ContactDTO;
-import zw.org.zvandiri.business.domain.util.CareLevel;
-import zw.org.zvandiri.business.domain.util.Gender;
-import zw.org.zvandiri.business.domain.util.YesNo;
+import zw.org.zvandiri.business.domain.Referral;
+import zw.org.zvandiri.business.domain.dto.*;
+import zw.org.zvandiri.business.domain.util.*;
 import zw.org.zvandiri.business.repo.CatDetailRepo;
 import zw.org.zvandiri.business.repo.ContactRepo;
 import zw.org.zvandiri.business.repo.PatientRepo;
@@ -25,6 +24,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -95,12 +95,7 @@ public class MobilePatientResource {
     @Resource
     private ServiceOfferedService serviceOfferedService;
     @Resource
-    private LabTaskService labTaskService;
-    @Resource
-    CatDetailRepo catDetailRepo;
-
-    @Resource
-    ContactRepo contactRepo;
+    private InvestigationTestService investigationTestService;
 
 
     @GetMapping("/initial-statics")
@@ -109,23 +104,92 @@ public class MobilePatientResource {
         MobileStaticsDTO mobileStaticsDTO = new MobileStaticsDTO();
 
         List<Patient> patients = patientService.getFacilityPatients(catDetail);
+        List<PatientListDTO> patientListDTOS=new ArrayList<>();
+        for(Patient patient: patients){
+            patientListDTOS.add(new PatientListDTO(patient));
+        }
         List<District> districts = districtService.getAll();
+        List<DistrictDTO> districtDTOS=new ArrayList<>();
+        for (District district: districts) {
+            districtDTOS.add(new DistrictDTO(district));
+        }
         List<Province> provinces = provinceService.getAll();
+        List<ProvinceDTO> provinceDTOS=new ArrayList<>();
+        for(Province province: provinces){
+            provinceDTOS.add(new ProvinceDTO(province));
+        }
         List<ServiceOffered> servicesOffered = serviceOfferedService.getAll();
-        List<ServicesReferred> servicesReferred = servicesReferredService.getAll();
-        List<Assessment> assessments = assessmentService.getAll();
-        List<Location> locations=locationService.getAll();
-        List<Position> positions=positionService.getAll();
+        List<ServiceOfferredDTO> serviceOfferredDTOS=new ArrayList<>();
+        for(ServiceOffered serviceOffered: servicesOffered){
+            serviceOfferredDTOS.add(new ServiceOfferredDTO(serviceOffered));
+        }
+        List<ServicesReferred> services = servicesReferredService.getAll();
+        List<ServiceReferredDTO> hivServiceReferredDTOS=new ArrayList<>();
+        for(ServicesReferred servicesReferred1: services.stream().filter(s1 -> s1.getReferalType().equals(ReferalType.HIV_STI_PREVENTION)).collect(Collectors.toList())){
+            hivServiceReferredDTOS.add(new ServiceReferredDTO(servicesReferred1));
+        }
+        List<ServiceReferredDTO> srhServiceReferredDTOS=new ArrayList<>();
+        for(ServicesReferred servicesReferred1: services.stream().filter(s1 -> s1.getReferalType().equals(ReferalType.SRH_SERVICES)).collect(Collectors.toList())){
+            srhServiceReferredDTOS.add(new ServiceReferredDTO(servicesReferred1));
+        }
+        List<ServiceReferredDTO> tbServiceReferredDTOS=new ArrayList<>();
+        for(ServicesReferred servicesReferred1: services.stream().filter(s1 -> s1.getReferalType().equals(ReferalType.TB_SERVICES)).collect(Collectors.toList())){
+            tbServiceReferredDTOS.add(new ServiceReferredDTO(servicesReferred1));
+        }
 
-        mobileStaticsDTO.setPatients(patients);
-        mobileStaticsDTO.setDistricts(districts);
-        mobileStaticsDTO.setProvinces(provinces);
-        mobileStaticsDTO.setServiceOffereds(servicesOffered);
-        mobileStaticsDTO.setServicesReferred(servicesReferred);
-        mobileStaticsDTO.setAssessments(assessments);
+        List<ServiceReferredDTO> oiServiceReferredDTOS=new ArrayList<>();
+        for(ServicesReferred servicesReferred1: services.stream().filter(s1 -> s1.getReferalType().equals(ReferalType.OI_ART_SERVICES)).collect(Collectors.toList())){
+            oiServiceReferredDTOS.add(new ServiceReferredDTO(servicesReferred1));
+        }
+
+        List<ServiceReferredDTO> legalServiceReferredDTOS=new ArrayList<>();
+        for(ServicesReferred servicesReferred1: services.stream().filter(s1 -> s1.getReferalType().equals(ReferalType.LEGAL_SUPPORT)).collect(Collectors.toList())){
+            legalServiceReferredDTOS.add(new ServiceReferredDTO(servicesReferred1));
+        }
+
+        List<ServiceReferredDTO> labServiceReferredDTOS=new ArrayList<>();
+        for(ServicesReferred servicesReferred1: services.stream().filter(s1 -> s1.getReferalType().equals(ReferalType.LABORATORY_DIAGNOSES)).collect(Collectors.toList())){
+            labServiceReferredDTOS.add(new ServiceReferredDTO(servicesReferred1));
+        }
+
+        List<ServiceReferredDTO> psychoServiceReferredDTOS=new ArrayList<>();
+        for(ServicesReferred servicesReferred1: services.stream().filter(s1 -> s1.getReferalType().equals(ReferalType.PSYCHO_SOCIAL_SUPPORT)).collect(Collectors.toList())){
+            psychoServiceReferredDTOS.add(new ServiceReferredDTO(servicesReferred1));
+        }
+
+        List<Assessment> assessments = assessmentService.getAll();
+        List<AssessmentDTO> assessmentDTOS= new ArrayList<>();
+        for(Assessment assessment: assessments){
+            assessmentDTOS.add(new AssessmentDTO(assessment));
+        }
+        List<Location> locations=locationService.getAll();
+        List<LocationDTO> locationDTOS=new ArrayList<>();
+        for(Location location: locations){
+            locationDTOS.add(new LocationDTO(location));
+        }
+        List<Position> positions=positionService.getAll();
+        List<PositionDTO> positionDTOS= new ArrayList<>();
+        for(Position position: positions){
+            positionDTOS.add(new PositionDTO(position));
+        }
+
+
+
+        mobileStaticsDTO.setPatients(patientListDTOS);
+        mobileStaticsDTO.setDistricts(districtDTOS);
+        mobileStaticsDTO.setProvinces(provinceDTOS);
+        mobileStaticsDTO.setServiceOffereds(serviceOfferredDTOS);
+        mobileStaticsDTO.setHivStiServicesReq(hivServiceReferredDTOS);
+        mobileStaticsDTO.setLaboratoryReq(labServiceReferredDTOS);
+        mobileStaticsDTO.setLegalReq(legalServiceReferredDTOS);
+        mobileStaticsDTO.setPsychReq(psychoServiceReferredDTOS);
+        mobileStaticsDTO.setOiArtReq(oiServiceReferredDTOS);
+        mobileStaticsDTO.setTbReq(tbServiceReferredDTOS);
+        mobileStaticsDTO.setSrhReq(srhServiceReferredDTOS);
+        mobileStaticsDTO.setAssessments(assessmentDTOS); //2.19
         mobileStaticsDTO.setUser(userService.getCurrentUser());
-        mobileStaticsDTO.setLocations(locations);
-        mobileStaticsDTO.setPositions(positions);
+        mobileStaticsDTO.setLocations(locationDTOS);
+        mobileStaticsDTO.setPositions(positionDTOS);
 
         System.err.println("<= User :" + email + " => Statics,********, User : "+userService.getCurrentUsername()+" <> "+patients.size()+" patients retrieved");
 
@@ -140,7 +204,6 @@ public class MobilePatientResource {
     @PostMapping(value = "/add-contacts")
     @Transactional
     public ResponseEntity<?> addContact(@RequestBody List<ContactDTO> contactDTOS) {
-        System.err.println("Sent Contact : " + contactDTOS);
         Response response=new Response(200,"Saved successfully","");
 
 
@@ -153,12 +216,12 @@ public class MobilePatientResource {
                 Position position=positionService.get(contactDTO.getPosition());
                 Location location=locationService.get(contactDTO.getLocation());
                 Contact contact=new Contact(contactDTO);
-                System.err.println("\n\n******************** user :"+user.getUserName()+"\n\n");
                 contact.setCreatedBy(user);
                 contact.setDateCreated(new Date());
                 contact.setPatient(patient);
                 contact.setLocation(location);
                 contact.setPosition(position);
+                contact.setRecordSource(RecordSource.MOBILE_APP);
                 Set<Assessment> nonClinicals=new HashSet<>();
                 for(String assessment:contactDTO.getNonClinicalAssessments()){
                     Assessment assessment1=assessmentService.get(assessment);
@@ -183,13 +246,175 @@ public class MobilePatientResource {
                     servicesReferreds.add(servicesReferred);
                 }
                 contact.setServicereferreds(servicesReferreds);
-
-                System.err.println("Contact >>>>>>>>> "+contact);
                 Contact contact1= contactService.save(contact);
-                //savedContas.add(contact1);
             }
-
+            System.err.println("\n\n******************** user :"+user.getUserName()+" saved contacts :"+contactDTOS.size()+"\n\n");
            response.setBaseEntities(savedContas);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setCode(500);
+            response.setMessage(e.getMessage());
+            response.setDescription(e.getLocalizedMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/add-vlcd4s")
+    @Transactional
+    public ResponseEntity<?> addVLCD4(@RequestBody List<VLCD4DTO> vlcd4DTOS) {
+        System.err.println("Sent Contact : " + vlcd4DTOS);
+        Response response=new Response(200,"Saved successfully","");
+        try {
+            User user=userService.getCurrentUser();
+
+            for(VLCD4DTO vlcd4DTO: vlcd4DTOS){
+                Patient patient=patientService.get(vlcd4DTO.getPatient());
+
+                InvestigationTest test=new InvestigationTest(vlcd4DTO);
+                test.setCreatedBy(user);
+                test.setDateCreated(new Date());
+                test.setPatient(patient);
+                test.setActive(true);
+                test.setRecordSource(RecordSource.MOBILE_APP);
+               InvestigationTest investigationTest=investigationTestService.save(test);
+
+            }
+            System.err.println("\n\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> "+user.getUserName()+" saved investigation test items :"+vlcd4DTOS.size()+"\n\n");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setCode(500);
+            response.setMessage(e.getMessage());
+            response.setDescription(e.getLocalizedMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/add-referrals")
+    @Transactional
+    public ResponseEntity<?> addReferrals(@RequestBody List<ReferralDTO> referralDTOS) {
+        Response response=new Response(200,"Saved successfully","");
+
+
+        try {
+            List<BaseEntity> savedReferrals=new ArrayList<>();
+            User user=userService.getCurrentUser();
+
+            for(ReferralDTO referralDTO: referralDTOS){
+                Patient patient=patientService.get(referralDTO.getPatient());
+
+                Referral referral=new Referral(referralDTO);
+                referral.setPatient(patient);
+                referral.setCreatedBy(user);
+                referral.setDateCreated(new Date());
+                referral.setPatient(patient);
+                referral.setRecordSource(RecordSource.MOBILE_APP);
+                Set<ServicesReferred> hivServicesAvailed=new HashSet<>();
+                for(ServiceReferredDTO service:referralDTO.getHivStiServicesAvailed()){
+                    ServicesReferred servicesReferred=servicesReferredService.get(service.getId());
+                    hivServicesAvailed.add(servicesReferred);
+                }
+                referral.setHivStiServicesAvailed(hivServicesAvailed);
+
+                Set<ServicesReferred> hivServicesReq=new HashSet<>();
+                for(ServiceReferredDTO service:referralDTO.getHivStiServicesReq()){
+                    ServicesReferred servicesReferred=servicesReferredService.get(service.getId());
+                    hivServicesReq.add(servicesReferred);
+                }
+                referral.setHivStiServicesReq(hivServicesReq);
+
+                Set<ServicesReferred> srhServicesReq=new HashSet<>();
+                for(ServiceReferredDTO service:referralDTO.getSrhReq()){
+                    ServicesReferred servicesReferred=servicesReferredService.get(service.getId());
+                    srhServicesReq.add(servicesReferred);
+                }
+                referral.setSrhReq(srhServicesReq);
+
+                Set<ServicesReferred> srhServicesAvailed=new HashSet<>();
+                for(ServiceReferredDTO service:referralDTO.getSrhAvailed()){
+                    ServicesReferred servicesReferred=servicesReferredService.get(service.getId());
+                    srhServicesAvailed.add(servicesReferred);
+                }
+                referral.setSrhAvailed(srhServicesAvailed);
+
+                Set<ServicesReferred> psychoServicesAvailed=new HashSet<>();
+                for(ServiceReferredDTO service:referralDTO.getPsychAvailed()){
+                    ServicesReferred servicesReferred=servicesReferredService.get(service.getId());
+                    psychoServicesAvailed.add(servicesReferred);
+                }
+                referral.setPsychAvailed(psychoServicesAvailed);
+
+                Set<ServicesReferred> psychoServicesReq=new HashSet<>();
+                for(ServiceReferredDTO service:referralDTO.getPsychReq()){
+                    ServicesReferred servicesReferred=servicesReferredService.get(service.getId());
+                    psychoServicesReq.add(servicesReferred);
+                }
+                referral.setPsychReq(psychoServicesReq);
+
+                Set<ServicesReferred> labServicesReq=new HashSet<>();
+                for(ServiceReferredDTO service:referralDTO.getLaboratoryReq()){
+                    ServicesReferred servicesReferred=servicesReferredService.get(service.getId());
+                    labServicesReq.add(servicesReferred);
+                }
+                referral.setLaboratoryReq(labServicesReq);
+
+                Set<ServicesReferred> labServicesAvailed=new HashSet<>();
+                for(ServiceReferredDTO service:referralDTO.getLaboratoryAvailed()){
+                    ServicesReferred servicesReferred=servicesReferredService.get(service.getId());
+                    labServicesAvailed.add(servicesReferred);
+                }
+                referral.setLaboratoryAvailed(labServicesAvailed);
+
+                Set<ServicesReferred> tbServicesAvailed=new HashSet<>();
+                for(ServiceReferredDTO service:referralDTO.getTbAvailed()){
+                    ServicesReferred servicesReferred=servicesReferredService.get(service.getId());
+                    tbServicesAvailed.add(servicesReferred);
+                }
+                referral.setTbAvailed(tbServicesAvailed);
+
+                Set<ServicesReferred> tbServicesReq=new HashSet<>();
+                for(ServiceReferredDTO service:referralDTO.getTbReq()){
+                    ServicesReferred servicesReferred=servicesReferredService.get(service.getId());
+                    tbServicesReq.add(servicesReferred);
+                }
+                referral.setTbReq(tbServicesReq);
+
+                Set<ServicesReferred> oiServicesReq=new HashSet<>();
+                for(ServiceReferredDTO service:referralDTO.getOiArtReq()){
+                    ServicesReferred servicesReferred=servicesReferredService.get(service.getId());
+                    oiServicesReq.add(servicesReferred);
+                }
+                referral.setOiArtReq(oiServicesReq);
+
+                Set<ServicesReferred> oiServicesAvailed=new HashSet<>();
+                for(ServiceReferredDTO service:referralDTO.getOiArtAvailed()){
+                    ServicesReferred servicesReferred=servicesReferredService.get(service.getId());
+                    oiServicesAvailed.add(servicesReferred);
+                }
+                referral.setOiArtAvailed(oiServicesAvailed);
+
+                Set<ServicesReferred> legalServicesAvailed=new HashSet<>();
+                for(ServiceReferredDTO service:referralDTO.getLegalAvailed()){
+                    ServicesReferred servicesReferred=servicesReferredService.get(service.getId());
+                    legalServicesAvailed.add(servicesReferred);
+                }
+                referral.setLegalAvailed(legalServicesAvailed);
+
+                Set<ServicesReferred> legalServicesReq=new HashSet<>();
+                for(ServiceReferredDTO service:referralDTO.getLegalReq()){
+                    ServicesReferred servicesReferred=servicesReferredService.get(service.getId());
+                    legalServicesReq.add(servicesReferred);
+                }
+                referral.setLegalReq(legalServicesReq);
+
+                Referral newRef=referralService.save(referral);
+
+
+            }
+            System.err.println("\n\n******************** user :"+user.getUserName()+" saved referrals :"+referralDTOS.size()+"\n\n");
         } catch (Exception e) {
             e.printStackTrace();
             response.setCode(500);
@@ -256,22 +481,6 @@ public class MobilePatientResource {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         response.put("message", "Patient created sucessfully");
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    @PostMapping("/add-referral")
-    public ResponseEntity<Map<String, Object>> addReferral(Referral referral) {
-        Map<String, Object> response = validateReferral(referral);
-        if (!response.isEmpty()) {
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
-        try {
-            referralService.save(referral);
-        } catch (Exception e) {
-            response.put("message", "System error occurred saving referral");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        response.put("message", "Referral created sucessfully");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

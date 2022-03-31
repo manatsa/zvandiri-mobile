@@ -24,6 +24,7 @@ import javax.persistence.Transient;
 import lombok.ToString;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import zw.org.zvandiri.business.domain.dto.VLCD4DTO;
 import zw.org.zvandiri.business.domain.util.TestType;
 import zw.org.zvandiri.business.domain.util.YesNo;
 
@@ -50,6 +51,17 @@ public class InvestigationTest extends TestResult {
 
     public InvestigationTest() {
     }
+
+    public InvestigationTest(VLCD4DTO vlcd4DTO) {
+        this.haveResult=vlcd4DTO.getHaveResult();
+        this.testType=vlcd4DTO.getTestType();
+        this.setTnd(vlcd4DTO.getTnd());
+        this.setNextTestDate(vlcd4DTO.getNextTestDate());
+        this.setDateTaken(vlcd4DTO.getDateTaken());
+
+    }
+
+
 
     public InvestigationTest(Patient patient, TestType testType) {
         super(patient);
