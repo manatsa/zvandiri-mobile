@@ -75,23 +75,23 @@ public class PatientDTO {
     private Date dateOfBirth;
     @ManyToOne
     @JoinColumn(name="education")
-    private Education education;
+    private String education;
     @ManyToOne
     @JoinColumn(name="education_level")
-    private EducationLevel educationLevel;
+    private String educationLevel;
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date dateJoined;
     @ManyToOne
     @JoinColumn(name="referer")
-    private Referer referer;
+    private String referer;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="primary_clinic")
-    private Facility primaryClinic;
+    private String primaryClinic;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="support_group")
-    private SupportGroup supportGroup;
+    private String supportGroup;
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date dateTested;
@@ -107,20 +107,20 @@ public class PatientDTO {
     private Gender pgender;
     @ManyToOne
     @JoinColumn(name="relationship")
-    private Relationship relationship;
+    private String relationship;
     private String secondaryMobileNumber;
     @Enumerated
     private YesNo mobileOwner;
     private String ownerName;
     @ManyToOne
     @JoinColumn(name="mobile_Owner_relation")
-    private Relationship mobileOwnerRelation;
+    private String mobileOwnerRelation;
     @Enumerated
     private YesNo ownSecondaryMobile;
     private String secondaryMobileOwnerName;
     @ManyToOne
     @JoinColumn(name="secondary_mobileowner_relation")
-    private Relationship secondaryMobileownerRelation;
+    private String secondaryMobileownerRelation;
     @Enumerated
     private TransmissionMode transmissionMode;
     @Enumerated
@@ -129,7 +129,7 @@ public class PatientDTO {
     private PatientChangeEvent status = PatientChangeEvent.ACTIVE;
     @ManyToOne
     @JoinColumn(name="reason_for_not_reachingolevel")
-    private ReasonForNotReachingOLevel reasonForNotReachingOLevel;
+    private String reasonForNotReachingOLevel;
     private String refererName;
     private String oINumber;
 
@@ -158,12 +158,12 @@ public class PatientDTO {
         this.address = patient.getAddress();
         this.mobileNumber = patient.getMobileNumber();
         this.dateOfBirth = patient.getDateOfBirth();
-        this.education = patient.getEducation();
-        this.educationLevel = patient.getEducationLevel();
+        this.education = patient.getEducation().getId();
+        this.educationLevel = patient.getEducationLevel().getId();
         this.dateJoined = patient.getDateJoined();
-        this.referer = patient.getReferer();
-        this.primaryClinic = patient.getPrimaryClinic();
-        this.supportGroup = patient.getSupportGroup();
+        this.referer = patient.getReferer().getId();
+        this.primaryClinic = patient.getPrimaryClinic().getId();
+        this.supportGroup = patient.getSupportGroup().getId();
         this.dateTested = patient.getDateTested();
         this.hIVDisclosureLocation = patient.gethIVDisclosureLocation();
         this.disability = patient.getDisability();
@@ -172,18 +172,18 @@ public class PatientDTO {
         this.plastName = patient.getPlastName();
         this.pmobileNumber = patient.getPmobileNumber();
         this.pgender = patient.getPgender();
-        this.relationship = patient.getRelationship();
+        this.relationship = patient.getRelationship().getId();
         this.secondaryMobileNumber = patient.getSecondaryMobileNumber();
         this.mobileOwner = patient.getMobileOwner();
         this.ownerName = patient.getOwnerName();
-        this.mobileOwnerRelation = patient.getMobileOwnerRelation();
+        this.mobileOwnerRelation = (patient.getMobileOwnerRelation()!=null)?patient.getMobileOwnerRelation().getId():null;
         this.ownSecondaryMobile = patient.getOwnSecondaryMobile();
         this.secondaryMobileOwnerName = patient.getSecondaryMobileOwnerName();
-        this.secondaryMobileownerRelation = patient.getSecondaryMobileownerRelation();
+        this.secondaryMobileownerRelation = (patient.getSecondaryMobileownerRelation()!=null)?patient.getSecondaryMobileownerRelation().getId():null;
         this.transmissionMode = patient.getTransmissionMode();
         this.hivStatusKnown = patient.getHivStatusKnown();
         this.status = patient.getStatus();
-        this.reasonForNotReachingOLevel = patient.getReasonForNotReachingOLevel();
+        this.reasonForNotReachingOLevel = (patient.getReasonForNotReachingOLevel()!=null)?patient.getReasonForNotReachingOLevel().getId():null;
         this.refererName = patient.getRefererName();
         this.oINumber = patient.getoINumber();
     }
@@ -356,22 +356,6 @@ public class PatientDTO {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public Education getEducation() {
-        return education;
-    }
-
-    public void setEducation(Education education) {
-        this.education = education;
-    }
-
-    public EducationLevel getEducationLevel() {
-        return educationLevel;
-    }
-
-    public void setEducationLevel(EducationLevel educationLevel) {
-        this.educationLevel = educationLevel;
-    }
-
     public Date getDateJoined() {
         return dateJoined;
     }
@@ -380,28 +364,12 @@ public class PatientDTO {
         this.dateJoined = dateJoined;
     }
 
-    public Referer getReferer() {
+    public String getReferer() {
         return referer;
     }
 
-    public void setReferer(Referer referer) {
+    public void setReferer(String referer) {
         this.referer = referer;
-    }
-
-    public Facility getPrimaryClinic() {
-        return primaryClinic;
-    }
-
-    public void setPrimaryClinic(Facility primaryClinic) {
-        this.primaryClinic = primaryClinic;
-    }
-
-    public SupportGroup getSupportGroup() {
-        return supportGroup;
-    }
-
-    public void setSupportGroup(SupportGroup supportGroup) {
-        this.supportGroup = supportGroup;
     }
 
     public Date getDateTested() {
@@ -468,14 +436,6 @@ public class PatientDTO {
         this.pgender = pgender;
     }
 
-    public Relationship getRelationship() {
-        return relationship;
-    }
-
-    public void setRelationship(Relationship relationship) {
-        this.relationship = relationship;
-    }
-
     public String getSecondaryMobileNumber() {
         return secondaryMobileNumber;
     }
@@ -500,14 +460,6 @@ public class PatientDTO {
         this.ownerName = ownerName;
     }
 
-    public Relationship getMobileOwnerRelation() {
-        return mobileOwnerRelation;
-    }
-
-    public void setMobileOwnerRelation(Relationship mobileOwnerRelation) {
-        this.mobileOwnerRelation = mobileOwnerRelation;
-    }
-
     public YesNo getOwnSecondaryMobile() {
         return ownSecondaryMobile;
     }
@@ -524,11 +476,11 @@ public class PatientDTO {
         this.secondaryMobileOwnerName = secondaryMobileOwnerName;
     }
 
-    public Relationship getSecondaryMobileownerRelation() {
+    public String getSecondaryMobileownerRelation() {
         return secondaryMobileownerRelation;
     }
 
-    public void setSecondaryMobileownerRelation(Relationship secondaryMobileownerRelation) {
+    public void setSecondaryMobileownerRelation(String secondaryMobileownerRelation) {
         this.secondaryMobileownerRelation = secondaryMobileownerRelation;
     }
 
@@ -556,14 +508,6 @@ public class PatientDTO {
         this.status = status;
     }
 
-    public ReasonForNotReachingOLevel getReasonForNotReachingOLevel() {
-        return reasonForNotReachingOLevel;
-    }
-
-    public void setReasonForNotReachingOLevel(ReasonForNotReachingOLevel reasonForNotReachingOLevel) {
-        this.reasonForNotReachingOLevel = reasonForNotReachingOLevel;
-    }
-
     public String getRefererName() {
         return refererName;
     }
@@ -578,5 +522,61 @@ public class PatientDTO {
 
     public void setoINumber(String oINumber) {
         this.oINumber = oINumber;
+    }
+
+    public String getEducation() {
+        return education;
+    }
+
+    public void setEducation(String education) {
+        this.education = education;
+    }
+
+    public String getEducationLevel() {
+        return educationLevel;
+    }
+
+    public void setEducationLevel(String educationLevel) {
+        this.educationLevel = educationLevel;
+    }
+
+    public String getPrimaryClinic() {
+        return primaryClinic;
+    }
+
+    public void setPrimaryClinic(String primaryClinic) {
+        this.primaryClinic = primaryClinic;
+    }
+
+    public String getSupportGroup() {
+        return supportGroup;
+    }
+
+    public void setSupportGroup(String supportGroup) {
+        this.supportGroup = supportGroup;
+    }
+
+    public String getRelationship() {
+        return relationship;
+    }
+
+    public void setRelationship(String relationship) {
+        this.relationship = relationship;
+    }
+
+    public String getMobileOwnerRelation() {
+        return mobileOwnerRelation;
+    }
+
+    public void setMobileOwnerRelation(String mobileOwnerRelation) {
+        this.mobileOwnerRelation = mobileOwnerRelation;
+    }
+
+    public String getReasonForNotReachingOLevel() {
+        return reasonForNotReachingOLevel;
+    }
+
+    public void setReasonForNotReachingOLevel(String reasonForNotReachingOLevel) {
+        this.reasonForNotReachingOLevel = reasonForNotReachingOLevel;
     }
 }

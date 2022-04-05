@@ -28,6 +28,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.Formula;
 import org.springframework.beans.factory.annotation.Configurable;
+import zw.org.zvandiri.business.domain.dto.PatientDTO;
 import zw.org.zvandiri.business.domain.util.*;
 import zw.org.zvandiri.business.domain.util.OrphanStatus;
 import zw.org.zvandiri.business.service.ContactService;
@@ -152,6 +153,47 @@ public class Patient extends GenericPatient {
     @JsonProperty(value = "clientType")
     private ClientType clientType;
 
+    public Patient(PatientDTO patientDTO) {
+        this.haveBirthCertificate = patientDTO.getHaveBirthCertificate();
+        this.IDNumber = patientDTO.getIDNumber();
+        this.maritalStatus = patientDTO.getMaritalStatus();
+        this.orphanStatus = patientDTO.getOrphanStatus();
+        this.onArvs = patientDTO.getOnArvs();
+        this.onCotrimoxazole = patientDTO.getOnCotrimoxazole();
+        this.dateStartedTreatment = patientDTO.getDateStartedTreatment();
+        this.disclosureType = patientDTO.getDisclosureType();
+        this.artRegimen = patientDTO.getArtRegimen();
+        this.isKeypopulation = patientDTO.getIsKeypopulation();
+        this.keyPopulation = patientDTO.getKeyPopulation();
+        this.disablityType = patientDTO.getDisablityType();
+        this.clientType = patientDTO.getClientType();
+        this.setLastName(patientDTO.getLastName());
+        this.setFirstName(patientDTO.getFirstName());
+        this.setMiddleName(patientDTO.getMiddleName());
+        this.setDateStartedTreatment(patientDTO.getDateStartedTreatment());
+        this.setAddress(patientDTO.getAddress());
+        this.setMobileNumber(patientDTO.getMobileNumber());
+        this.setMobileOwner(patientDTO.getMobileOwner());
+        this.setOwnerName(patientDTO.getOwnerName());
+        this.setSecondaryMobileNumber(patientDTO.getSecondaryMobileNumber());
+        this.setSecondaryMobileOwnerName(patientDTO.getSecondaryMobileOwnerName());
+        this.setOwnSecondaryMobile(patientDTO.getOwnSecondaryMobile());
+        this.setDateOfBirth(patientDTO.getDateOfBirth());
+        this.setGender(patientDTO.getGender());
+        this.setConsentToMHealth(patientDTO.getConsentToMHealth());
+        this.setHivStatusKnown(patientDTO.getHivStatusKnown());
+        this.sethIVDisclosureLocation(patientDTO.gethIVDisclosureLocation());
+        this.setDateJoined(patientDTO.getDateJoined());
+        this.setDateTested(patientDTO.getDateTested());
+        this.setTransmissionMode(patientDTO.getTransmissionMode());
+        this.setoINumber(patientDTO.getoINumber());
+        this.setStatus(patientDTO.getStatus());
+        this.setPfirstName(patientDTO.getPfirstName());
+        this.setPlastName(patientDTO.getPlastName());
+        this.setPgender(patientDTO.getPgender());
+        this.setRefererName(patientDTO.getRefererName());
+
+    }
 
     public InvestigationTest getLastPatientVL(InvestigationTestService investigationTestService) {
 
