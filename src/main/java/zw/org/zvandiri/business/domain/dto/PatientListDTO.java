@@ -31,21 +31,9 @@ public class PatientListDTO {
     private String facility;
     private Integer age;
     private String district;
+    private String facilityID;
 
     public PatientListDTO() {
-    }
-
-    public PatientListDTO(String id,Integer enhancedStatus, String firstName, String lastName, Gender gender,  String mobileNumber, Date dateOfBirth, String facility, Integer age, String district) {
-        this.id=id;
-        this.enhancedStatus = enhancedStatus;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.gender = gender;
-        this.mobileNumber = mobileNumber;
-        this.dateOfBirth = dateOfBirth;
-        this.facility = facility;
-        this.age = age;
-        this.district=district;
     }
 
     public PatientListDTO(Patient patient){
@@ -59,6 +47,7 @@ public class PatientListDTO {
         this.facility = patient.getPrimaryClinic().getName();
         this.district=patient.getPrimaryClinic().getDistrict().getName();
         this.age = patient.getAge();
+        this.facilityID=patient.getPrimaryClinic().getId();
     }
 
     public String getId() {
@@ -139,5 +128,13 @@ public class PatientListDTO {
 
     public void setAge(Integer age) {
         this.age = age;
+    }
+
+    public String getFacilityID() {
+        return facilityID;
+    }
+
+    public void setFacilityID(String facilityID) {
+        this.facilityID = facilityID;
     }
 }

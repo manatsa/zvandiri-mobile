@@ -82,6 +82,10 @@ public class User extends BaseEntity {
     @Transient
     private String token;
 
+    @Transient
+    private  String facilityId;
+
+
 
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "user_role", joinColumns = {
@@ -217,6 +221,14 @@ public class User extends BaseEntity {
 
     public void setCurrentElement(String currentElement) {
         this.currentElement = currentElement;
+    }
+
+    public String getFacilityId() {
+        return facilityId;
+    }
+
+    public void setFacilityId(String facilityId) {
+        this.facilityId = facilityId;
     }
 
     @Override

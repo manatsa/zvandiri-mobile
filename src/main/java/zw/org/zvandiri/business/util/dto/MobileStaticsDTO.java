@@ -18,12 +18,12 @@ public class MobileStaticsDTO implements Serializable {
     List<DistrictDTO> districts;
     List<ProvinceDTO> provinces;
     List<FacilityDTO> facilities;
-    List<SupportGroup> supportGroups;
-    List<Relationship> relationships;
-    List<Referer> referers;
+    List<SupportGroupDTO> supportGroups;
+    List<RelationshipDTO> relationships;
+    List<RefererDTO> referers;
     List<OrphanStatus> orphanStatuses;
-    List<Education> educations;
-    List<EducationLevel> educationLevels;
+    List<EducationDTO> educations;
+    List<EducationLevelDTO> educationLevels;
     List<LocationDTO> locations;
     List<PositionDTO> positions;
     List<ChronicInfection> chronicInfections;
@@ -50,8 +50,8 @@ public class MobileStaticsDTO implements Serializable {
     List<HospCause> hospCauses;
     List<Substance> substances;
     List<ActionTaken> actionTakens;
-    List<ReasonForNotReachingOLevel> reasonForNotReachingOLevels;
-    User user;
+    List<ReasonForNotReachingOLvelDTO> reasonForNotReachingOLevels;
+    User currentUser;
     List<LabTaskService> labTaskServices;
 
     public MobileStaticsDTO() {
@@ -89,52 +89,12 @@ public class MobileStaticsDTO implements Serializable {
         this.facilities = facilities;
     }
 
-    public List<SupportGroup> getSupportGroups() {
-        return supportGroups;
-    }
-
-    public void setSupportGroups(List<SupportGroup> supportGroups) {
-        this.supportGroups = supportGroups;
-    }
-
-    public List<Relationship> getRelationships() {
-        return relationships;
-    }
-
-    public void setRelationships(List<Relationship> relationships) {
-        this.relationships = relationships;
-    }
-
-    public List<Referer> getReferers() {
-        return referers;
-    }
-
-    public void setReferers(List<Referer> referers) {
-        this.referers = referers;
-    }
-
     public List<OrphanStatus> getOrphanStatuses() {
         return orphanStatuses;
     }
 
     public void setOrphanStatuses(List<OrphanStatus> orphanStatuses) {
         this.orphanStatuses = orphanStatuses;
-    }
-
-    public List<Education> getEducations() {
-        return educations;
-    }
-
-    public void setEducations(List<Education> educations) {
-        this.educations = educations;
-    }
-
-    public List<EducationLevel> getEducationLevels() {
-        return educationLevels;
-    }
-
-    public void setEducationLevels(List<EducationLevel> educationLevels) {
-        this.educationLevels = educationLevels;
     }
 
     public List<LocationDTO> getLocations() {
@@ -345,20 +305,60 @@ public class MobileStaticsDTO implements Serializable {
         this.actionTakens = actionTakens;
     }
 
-    public List<ReasonForNotReachingOLevel> getReasonForNotReachingOLevels() {
+    public List<ReasonForNotReachingOLvelDTO> getReasonForNotReachingOLevels() {
         return reasonForNotReachingOLevels;
     }
 
-    public void setReasonForNotReachingOLevels(List<ReasonForNotReachingOLevel> reasonForNotReachingOLevels) {
+    public List<SupportGroupDTO> getSupportGroups() {
+        return supportGroups;
+    }
+
+    public void setSupportGroups(List<SupportGroupDTO> supportGroups) {
+        this.supportGroups = supportGroups;
+    }
+
+    public List<RelationshipDTO> getRelationships() {
+        return relationships;
+    }
+
+    public void setRelationships(List<RelationshipDTO> relationships) {
+        this.relationships = relationships;
+    }
+
+    public List<RefererDTO> getReferers() {
+        return referers;
+    }
+
+    public void setReferers(List<RefererDTO> referers) {
+        this.referers = referers;
+    }
+
+    public List<EducationDTO> getEducations() {
+        return educations;
+    }
+
+    public void setEducations(List<EducationDTO> educations) {
+        this.educations = educations;
+    }
+
+    public List<EducationLevelDTO> getEducationLevels() {
+        return educationLevels;
+    }
+
+    public void setEducationLevels(List<EducationLevelDTO> educationLevels) {
+        this.educationLevels = educationLevels;
+    }
+
+    public void setReasonForNotReachingOLevels(List<ReasonForNotReachingOLvelDTO> reasonForNotReachingOLevels) {
         this.reasonForNotReachingOLevels = reasonForNotReachingOLevels;
     }
 
-    public User getUser() {
-        return user;
+    public User getCurrentUser() {
+        return currentUser;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setCurrentUser(User currentUser) {
+        this.currentUser = currentUser;
     }
 
     public List<LabTaskService> getLabTaskServices() {

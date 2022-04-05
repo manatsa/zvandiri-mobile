@@ -101,11 +101,13 @@ public class MobilePatientResource {
     @GetMapping("/initial-statics")
     public MobileStaticsDTO getCatPatients(@RequestParam("email") String email) {
         long start=System.currentTimeMillis();
+        User currentUser=userService.getCurrentUser();
         List<Patient> patients=new ArrayList<>();
         MobileStaticsDTO mobileStaticsDTO = new MobileStaticsDTO();
         User logUser=userService.findByUserName(email);
         if(logUser.getUserLevel()==null ||logUser.getUserLevel().equals(UserLevel.FACILITY)){
             CatDetail catDetail = catDetailService.getByEmail(email);
+            currentUser.setFacilityId(catDetail.getPrimaryClinic().getId());
             patients = patientService.getFacilityPatients(catDetail);
         }else if(logUser.getUserLevel().equals(UserLevel.DISTRICT)){
             patients=patientService.getActiveByDistrict(logUser.getDistrict());
@@ -129,6 +131,32 @@ public class MobilePatientResource {
         for(Province province: provinces){
             provinceDTOS.add(new ProvinceDTO(province));
         }
+        List<Facility> facilities = facilityService.getAll();
+        List<FacilityDTO> facilityDTOS = new ArrayList<>();
+        if(currentUser.getUserLevel()==UserLevel.DISTRICT) {
+            facilities = facilityService.getOptByDistrict(currentUser.getDistrict());
+            for (Facility facility : facilities) {
+                facilityDTOS.add(new FacilityDTO(facility));
+            }
+        }
+
+        List<SupportGroup> supportGroups=supportGroupService.getAll();
+        List<SupportGroupDTO> supportGroupDTOS=new ArrayList<>();
+        if(currentUser.getUserLevel()==UserLevel.DISTRICT) {
+            supportGroups=supportGroupService.getByDistrict(currentUser.getDistrict());
+            System.err.println("1. "+supportGroups);
+            for (SupportGroup supportGroup : supportGroups) {
+                supportGroupDTOS.add(new SupportGroupDTO(supportGroup));
+            }
+        }else if(currentUser.getUserLevel()==UserLevel.FACILITY || currentUser.getUserLevel()==null ){
+            CatDetail catDetail=catDetailService.getByEmail(currentUser.getUserName());
+            supportGroups=supportGroupService.getByDistrict(catDetail.getPrimaryClinic().getDistrict());
+            System.err.println("2. "+supportGroups);
+            for (SupportGroup supportGroup : supportGroups) {
+                supportGroupDTOS.add(new SupportGroupDTO(supportGroup));
+            }
+        }
+
         List<ServiceOffered> servicesOffered = serviceOfferedService.getAll();
         List<ServiceOfferredDTO> serviceOfferredDTOS=new ArrayList<>();
         for(ServiceOffered serviceOffered: servicesOffered){
@@ -184,11 +212,45 @@ public class MobilePatientResource {
             positionDTOS.add(new PositionDTO(position));
         }
 
+        List<Relationship> relationships=relationshipService.getAll();
+        List<RelationshipDTO> relationshipDTOS=new ArrayList<>();
+        for(Relationship relationship: relationships){
+            relationshipDTOS.add(new RelationshipDTO(relationship));
+        }
+
+        List<Referer> referers =refererService.getAll();
+        List<RefererDTO> refererDTOS= new ArrayList<>();
+        for(Referer referer: referers){
+            refererDTOS.add(new RefererDTO(referer));
+        }
+
+        List<EducationLevel> educationLevels=educationLevelService.getAll();
+        List<EducationLevelDTO> educationLevelDTOS=new ArrayList<>();
+        for(EducationLevel educationLevel: educationLevels){
+            educationLevelDTOS.add(new EducationLevelDTO(educationLevel));
+        }
+
+        List<Education> educations=educationService.getAll();
+        List<EducationDTO> educationDTOS=new ArrayList<>();
+        for(Education education: educations){
+            educationDTOS.add(new EducationDTO(education));
+        }
+
+        List<ReasonForNotReachingOLevel> reasonForNotReachingOLevels=reasonForNotReachingOLevelService.getAll();
+        List<ReasonForNotReachingOLvelDTO> reasonForNotReachingOLvelDTOS= new ArrayList<>();
+        for(ReasonForNotReachingOLevel reasonForNotReachingOLevel: reasonForNotReachingOLevels){
+            reasonForNotReachingOLvelDTOS.add(new ReasonForNotReachingOLvelDTO(reasonForNotReachingOLevel));
+        }
+
+
+
+
 
 
         mobileStaticsDTO.setPatients(patientListDTOS);
         mobileStaticsDTO.setDistricts(districtDTOS);
         mobileStaticsDTO.setProvinces(provinceDTOS);
+        mobileStaticsDTO.setFacilities(facilityDTOS);
         mobileStaticsDTO.setServiceOffereds(serviceOfferredDTOS);
         mobileStaticsDTO.setHivStiServicesReq(hivServiceReferredDTOS);
         mobileStaticsDTO.setLaboratoryReq(labServiceReferredDTOS);
@@ -198,14 +260,22 @@ public class MobilePatientResource {
         mobileStaticsDTO.setTbReq(tbServiceReferredDTOS);
         mobileStaticsDTO.setSrhReq(srhServiceReferredDTOS);
         mobileStaticsDTO.setAssessments(assessmentDTOS); //2.19
-        mobileStaticsDTO.setUser(userService.getCurrentUser());
+        mobileStaticsDTO.setCurrentUser(currentUser);
         mobileStaticsDTO.setLocations(locationDTOS);
         mobileStaticsDTO.setPositions(positionDTOS);
+        mobileStaticsDTO.setRelationships(relationshipDTOS);
+        mobileStaticsDTO.setReferers(refererDTOS);
+        mobileStaticsDTO.setEducations(educationDTOS);
+        mobileStaticsDTO.setEducationLevels(educationLevelDTOS);
+        mobileStaticsDTO.setSupportGroups(supportGroupDTOS);
+        mobileStaticsDTO.setReasonForNotReachingOLevels(reasonForNotReachingOLvelDTOS);
+
         long end = System.currentTimeMillis();
         long time=(end-start)/(60000);
         String timeTaken=time<120 ? time+" mins": ((double)Math.round(time/60))+" hrs";
         System.err.println("<= User::" + email + " => Statics,********, User : "+userService.getCurrentUsername()+" <> "+
                 patients.size()+" patients retrieved ******** Time Taken:: "+timeTaken);
+
 
         return mobileStaticsDTO;
     }
