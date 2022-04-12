@@ -67,17 +67,13 @@ public class MobilePatientResource {
     @Resource
     private PositionService positionService;
     @Resource
-    private InternalReferralService internalReferralService;
-    @Resource
-    private ExternalReferralService externalReferralService;
-    @Resource
-    private ChronicInfectionService chronicInfectionService;
+    TbIptService tbIptService;
     @Resource
     private ServicesReferredService servicesReferredService;
     @Resource
     private HivCoInfectionService hivCoInfectionService;
     @Resource
-    private MentalHealthService mentalHealthService;
+    private MentalHealthScreeningService mentalHealthScreeningService;
     @Resource
     private DisabilityCategoryService disabilityCategoryService;
     @Resource
@@ -144,14 +140,12 @@ public class MobilePatientResource {
         List<SupportGroupDTO> supportGroupDTOS=new ArrayList<>();
         if(currentUser.getUserLevel()==UserLevel.DISTRICT) {
             supportGroups=supportGroupService.getByDistrict(currentUser.getDistrict());
-            System.err.println("1. "+supportGroups);
             for (SupportGroup supportGroup : supportGroups) {
                 supportGroupDTOS.add(new SupportGroupDTO(supportGroup));
             }
         }else if(currentUser.getUserLevel()==UserLevel.FACILITY || currentUser.getUserLevel()==null ){
             CatDetail catDetail=catDetailService.getByEmail(currentUser.getUserName());
             supportGroups=supportGroupService.getByDistrict(catDetail.getPrimaryClinic().getDistrict());
-            System.err.println("2. "+supportGroups);
             for (SupportGroup supportGroup : supportGroups) {
                 supportGroupDTOS.add(new SupportGroupDTO(supportGroup));
             }
@@ -201,6 +195,7 @@ public class MobilePatientResource {
         for(Assessment assessment: assessments){
             assessmentDTOS.add(new AssessmentDTO(assessment));
         }
+
         List<Location> locations=locationService.getAll();
         List<LocationDTO> locationDTOS=new ArrayList<>();
         for(Location location: locations){
@@ -562,6 +557,70 @@ public class MobilePatientResource {
 
             }
             System.err.println("\n\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + user.getUserName() + " saved new Clients items :" + patientDTOS.size() + "\n\n");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setCode(500);
+            response.setMessage(e.getMessage());
+            response.setDescription(e.getLocalizedMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/add-mental-health-screening-items")
+    @Transactional
+    public ResponseEntity<?> addMHScreenings(@RequestBody List<MentalHealthScreeningDTO> mentalHealthScreeningDTOS) {
+
+        Response response=new Response(200,"Saved successfully","");
+        try {
+            User user=userService.getCurrentUser();
+
+            for(MentalHealthScreeningDTO mentalHealthScreeningDTO: mentalHealthScreeningDTOS){
+                Patient patient=patientService.get(mentalHealthScreeningDTO.getPatient());
+
+                MentalHealthScreening mentalHealthScreening=new MentalHealthScreening(mentalHealthScreeningDTO);
+                mentalHealthScreening.setCreatedBy(user);
+                mentalHealthScreening.setDateCreated(new Date());
+                mentalHealthScreening.setPatient(patient);
+                mentalHealthScreening.setActive(true);
+                mentalHealthScreening.setRecordSource(RecordSource.MOBILE_APP);
+                MentalHealthScreening mentalHealthScreening1=mentalHealthScreeningService.save(mentalHealthScreening);
+
+            }
+            System.err.println("\n\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> "+user.getUserName()+" saved MH Screening test items :"+mentalHealthScreeningDTOS.size()+"\n\n");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setCode(500);
+            response.setMessage(e.getMessage());
+            response.setDescription(e.getLocalizedMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/add-tb-tpt-screening-items")
+    @Transactional
+    public ResponseEntity<?> addTBScreenings(@RequestBody List<TbTPTDTO> tbTPTDTOS) {
+
+        Response response=new Response(200,"Saved successfully","");
+        try {
+            User user=userService.getCurrentUser();
+
+            for(TbTPTDTO tbTPTDTO: tbTPTDTOS){
+                Patient patient=patientService.get(tbTPTDTO.getPatient());
+
+                TbIpt tbIpt=new TbIpt(tbTPTDTO);
+                tbIpt.setCreatedBy(user);
+                tbIpt.setDateCreated(new Date());
+                tbIpt.setPatient(patient);
+                tbIpt.setActive(true);
+                tbIpt.setRecordSource(RecordSource.MOBILE_APP);
+                TbIpt tbIpt1=tbIptService.save(tbIpt);
+
+            }
+            System.err.println("\n\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> "+user.getUserName()+" saved TB Screening test items :"+tbTPTDTOS.size()+"\n\n");
         } catch (Exception e) {
             e.printStackTrace();
             response.setCode(500);

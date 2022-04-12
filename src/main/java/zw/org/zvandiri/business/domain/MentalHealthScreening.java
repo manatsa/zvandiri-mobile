@@ -7,9 +7,12 @@ package zw.org.zvandiri.business.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.ToString;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import zw.org.zvandiri.business.domain.dto.MentalHealthScreeningDTO;
 import zw.org.zvandiri.business.domain.util.*;
 import zw.org.zvandiri.business.domain.util.Referral;
+import zw.org.zvandiri.business.service.PatientService;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -31,7 +34,7 @@ public class MentalHealthScreening extends BaseEntity {
     @ManyToOne(optional = false)
     @JsonIgnore
     @NotNull
-    @JoinColumn(name="patient", updatable = false, insertable = false)
+    @JoinColumn(name="patient")
     private Patient patient;
     @Enumerated
     private YesNo screenedForMentalHealth;
@@ -94,6 +97,16 @@ public class MentalHealthScreening extends BaseEntity {
     }
 
     public MentalHealthScreening() {
+    }
+
+    public MentalHealthScreening(MentalHealthScreeningDTO mentalHealthScreeningDTO){
+        this.screenedForMentalHealth=mentalHealthScreeningDTO.getScreenedForMentalHealth();
+        this.dateScreened=mentalHealthScreeningDTO.getDateScreened();
+        this.risk=mentalHealthScreeningDTO.getRisk();
+        this.identifiedRisks= mentalHealthScreeningDTO.getIdentifiedRisks();
+        this.support=mentalHealthScreeningDTO.getSupport();
+        this.supports= mentalHealthScreeningDTO.getSupports();
+        this.referral=mentalHealthScreeningDTO.getReferral();
     }
 
     public Patient getPatient() {

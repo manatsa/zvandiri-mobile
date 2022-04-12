@@ -9,7 +9,7 @@ import zw.org.zvandiri.business.util.StringUtils;
 
 
 public enum ClientType {
-    CAYPLHIV(1),YOUNG_MUM(2), OTHER(3);
+    CAYPLHIV(1),YOUNG_MUM(2), YOUNG_DAD(3), OTHER(4);
 
     private final Integer code;
 
@@ -29,6 +29,8 @@ public enum ClientType {
             case "2":
                 return YOUNG_MUM;
             case "3":
+                return YOUNG_DAD;
+            case "4":
                 return OTHER;
             default:
                 throw new IllegalArgumentException("Illegal parameter passed to method :"+code);

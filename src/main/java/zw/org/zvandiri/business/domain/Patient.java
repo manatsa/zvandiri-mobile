@@ -153,6 +153,9 @@ public class Patient extends GenericPatient {
     @JsonProperty(value = "clientType")
     private ClientType clientType;
 
+    public Patient() {
+    }
+
     public Patient(PatientDTO patientDTO) {
         this.haveBirthCertificate = patientDTO.getHaveBirthCertificate();
         this.IDNumber = patientDTO.getIDNumber();

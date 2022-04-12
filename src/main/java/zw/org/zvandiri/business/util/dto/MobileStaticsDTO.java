@@ -57,6 +57,8 @@ public class MobileStaticsDTO implements Serializable {
     public MobileStaticsDTO() {
     }
 
+
+
     public List<PatientListDTO> getPatients() {
         return patients;
     }

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.ToString;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.format.annotation.DateTimeFormat;
+import zw.org.zvandiri.business.domain.dto.TbTPTDTO;
 import zw.org.zvandiri.business.domain.util.TbIdentificationOutcome;
 import zw.org.zvandiri.business.domain.util.TbSymptom;
 import zw.org.zvandiri.business.domain.util.YesNo;
@@ -30,7 +31,7 @@ import java.util.Set;
 public class TbIpt extends BaseEntity {
 
     @ManyToOne
-    @JoinColumn(name="patient", updatable = false, insertable = false)
+    @JoinColumn(name="patient")
     private Patient patient;
     @Enumerated
     private YesNo screenedForTb;
@@ -95,7 +96,29 @@ public class TbIpt extends BaseEntity {
 
     public TbIpt() {
     }
-    
+
+    public TbIpt(TbTPTDTO tbIpt) {
+        this.screenedForTb = tbIpt.getScreenedForTb();
+        this.dateScreened = tbIpt.getDateScreened();
+        this.identifiedWithTb = tbIpt.getIdentifiedWithTb();
+        this.tbSymptoms = tbIpt.getTbSymptoms();
+        this.referredForInvestigation = tbIpt.getReferredForInvestigation();
+        this.eligibleForIpt = tbIpt.getEligibleForIpt();
+        this.referredForIpt = tbIpt.getReferredForIpt();
+        this.referralComplete = tbIpt.getReferralComplete();
+        this.screenedByHcw = tbIpt.getScreenedByHcw();
+        this.identifiedWithTbByHcw = tbIpt.getIdentifiedWithTbByHcw();
+        this.onTBTreatment = tbIpt.getOnTBTreatment();
+        this.dateStartedTreatment = tbIpt.getDateStartedTreatment();
+        this.dateCompletedTreatment = tbIpt.getDateCompletedTreatment();
+        this.onIpt = tbIpt.getOnIpt();
+        this.dateStartedIpt = tbIpt.getDateStartedIpt();
+        this.dateCompletedIpt = tbIpt.getDateCompletedIpt();
+        this.startedOnIpt = tbIpt.getStartedOnIpt();
+        this.dateStartedOnIpt = tbIpt.getDateStartedOnIpt();
+        this.dateCompletedOnIpt = tbIpt.getDateCompletedOnIpt();
+    }
+
     public TbIpt(Patient patient) {
         this.patient = patient;
     }
@@ -155,22 +178,6 @@ public class TbIpt extends BaseEntity {
     public void setDateStartedTreatment(Date dateStartedTreatment) {
         this.dateStartedTreatment = dateStartedTreatment;
     }
-
-   /* public String getReferralForSputum() {
-        return referralForSputum;
-    }
-
-    public void setReferralForSputum(String referralForSputum) {
-        this.referralForSputum = referralForSputum;
-    }
-
-    public TbTreatmentOutcome getTbTreatmentOutcome() {
-        return tbTreatmentOutcome;
-    }
-
-    public void setTbTreatmentOutcome(TbTreatmentOutcome tbTreatmentOutcome) {
-        this.tbTreatmentOutcome = tbTreatmentOutcome;
-    }*/
 
     public YesNo getReferredForIpt() {
         return referredForIpt;

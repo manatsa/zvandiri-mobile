@@ -3,13 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package zw.org.zvandiri.business.domain;
+package zw.org.zvandiri.business.domain.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.ToString;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.format.annotation.DateTimeFormat;
-import zw.org.zvandiri.business.domain.util.TbIdentificationOutcome;
+import zw.org.zvandiri.business.domain.Patient;
+import zw.org.zvandiri.business.domain.TbIpt;
 import zw.org.zvandiri.business.domain.util.TbSymptom;
 import zw.org.zvandiri.business.domain.util.YesNo;
 
@@ -18,20 +17,15 @@ import java.util.Date;
 import java.util.Set;
 
 /**
- *
- * @author tasu
+ * @author manatsachinyeruse@gmail.com
  */
-@Entity @JsonIgnoreProperties(ignoreUnknown = true)
-/*@Table(indexes = {
-		@Index(name = "tb_ipt_patient", columnList = "patient"),
-		@Index(name = "tb_ipt_created_by", columnList = "created_by")
-})*/
+
 @ToString()
-public class TbIpt extends BaseEntity {
+public class TbTPTDTO {
 
     @ManyToOne
-    @JoinColumn(name="patient", updatable = false, insertable = false)
-    private Patient patient;
+    @JoinColumn(name = "patient")
+    private String patient;
     @Enumerated
     private YesNo screenedForTb;
     @Temporal(TemporalType.DATE)
@@ -39,11 +33,7 @@ public class TbIpt extends BaseEntity {
     private Date dateScreened;
     @Enumerated
     private YesNo identifiedWithTb;
-    @JsonIgnore
-    @ElementCollection(targetClass = TbSymptom.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "tb_symptom",
-            joinColumns = @JoinColumn(name = "tb_id"))
-    @Column(name = "symptom_id")
+    @ElementCollection
     private Set<TbSymptom> tbSymptoms;
     @Enumerated
     private YesNo referredForInvestigation;
@@ -82,29 +72,37 @@ public class TbIpt extends BaseEntity {
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date dateCompletedOnIpt;
 
-    @Enumerated
-    private TbIdentificationOutcome tbIdentificationOutcome;
 
-    //Need further info on this
-    /*private String referralForSputum;
-    @Enumerated
-    private TbTreatmentOutcome tbTreatmentOutcome;*/
-
-
-
-
-    public TbIpt() {
-    }
-    
-    public TbIpt(Patient patient) {
-        this.patient = patient;
+    public TbTPTDTO() {
     }
 
-    public Patient getPatient() {
+    public TbTPTDTO(TbIpt tbIpt) {
+        this.screenedForTb = tbIpt.getScreenedForTb();
+        this.dateScreened = tbIpt.getDateScreened();
+        this.identifiedWithTb = tbIpt.getIdentifiedWithTb();
+        this.tbSymptoms = tbIpt.getTbSymptoms();
+        this.referredForInvestigation = tbIpt.getReferredForInvestigation();
+        this.eligibleForIpt = tbIpt.getEligibleForIpt();
+        this.referredForIpt = tbIpt.getReferredForIpt();
+        this.referralComplete = tbIpt.getReferralComplete();
+        this.screenedByHcw = tbIpt.getScreenedByHcw();
+        this.identifiedWithTbByHcw = tbIpt.getIdentifiedWithTbByHcw();
+        this.onTBTreatment = tbIpt.getOnTBTreatment();
+        this.dateStartedTreatment = tbIpt.getDateStartedTreatment();
+        this.dateCompletedTreatment = tbIpt.getDateCompletedTreatment();
+        this.onIpt = tbIpt.getOnIpt();
+        this.dateStartedIpt = tbIpt.getDateStartedIpt();
+        this.dateCompletedIpt = tbIpt.getDateCompletedIpt();
+        this.startedOnIpt = tbIpt.getStartedOnIpt();
+        this.dateStartedOnIpt = tbIpt.getDateStartedOnIpt();
+        this.dateCompletedOnIpt = tbIpt.getDateCompletedOnIpt();
+    }
+
+    public String getPatient() {
         return patient;
     }
 
-    public void setPatient(Patient patient) {
+    public void setPatient(String patient) {
         this.patient = patient;
     }
 
@@ -138,14 +136,6 @@ public class TbIpt extends BaseEntity {
 
     public void setIdentifiedWithTb(YesNo identifiedWithTb) {
         this.identifiedWithTb = identifiedWithTb;
-    }
-
-    public TbIdentificationOutcome getTbIdentificationOutcome() {
-        return tbIdentificationOutcome;
-    }
-
-    public void setTbIdentificationOutcome(TbIdentificationOutcome tbIdentificationOutcome) {
-        this.tbIdentificationOutcome = tbIdentificationOutcome;
     }
 
     public Date getDateStartedTreatment() {
@@ -285,16 +275,16 @@ public class TbIpt extends BaseEntity {
     }
 
     public String getSymptoms() {
-        if(tbSymptoms.isEmpty()){
+        if (tbSymptoms.isEmpty()) {
             return "";
         }
         StringBuilder r = new StringBuilder();
         int pos = 1;
-        for(TbSymptom role : tbSymptoms){
-            if(pos < tbSymptoms.size()) {
+        for (TbSymptom role : tbSymptoms) {
+            if (pos < tbSymptoms.size()) {
                 r.append(role.getName());
                 r.append(" ,");
-            }else{
+            } else {
                 r.append(role.getName());
             }
             pos++;
@@ -302,12 +292,12 @@ public class TbIpt extends BaseEntity {
         return r.toString();
     }
 
-	@Override
-	public String toString() {
-		return "TbIpt [patient=" + patient + ", screenedForTb=" + screenedForTb + ", dateScreened=" + dateScreened
-				+ ", tbSymptoms=" + tbSymptoms + ", identifiedWithTb=" + identifiedWithTb + ", tbIdentificationOutcome="
-				+ tbIdentificationOutcome + ", dateStartedTreatment=" + dateStartedTreatment  + ", referredForIpt="
-				+ referredForIpt + ", onIpt=" + onIpt + ", dateStartedIpt=" + dateStartedIpt + "]";
-	}
-    
+    @Override
+    public String toString() {
+        return "TbIpt [patient=" + patient + ", screenedForTb=" + screenedForTb + ", dateScreened=" + dateScreened
+                + ", tbSymptoms=" + tbSymptoms + ", identifiedWithTb=" + identifiedWithTb + ", dateStartedTreatment=" +
+                dateStartedTreatment + ", referredForIpt="
+                + referredForIpt + ", onIpt=" + onIpt + ", dateStartedIpt=" + dateStartedIpt + "]";
+    }
+
 }

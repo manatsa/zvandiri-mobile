@@ -64,7 +64,6 @@ public class PatientServiceImpl implements PatientService {
         if (id == null) {
             throw new IllegalStateException("Item to be does not exist :" + id);
         }
-        System.err.println("Patient ID is "+id);
         return patientRepo.findById(id).get();
     }
 
