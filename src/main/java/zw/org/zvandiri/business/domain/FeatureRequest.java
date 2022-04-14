@@ -1,6 +1,7 @@
 package zw.org.zvandiri.business.domain;
 
 
+import zw.org.zvandiri.business.domain.dto.FeatureRequestDTO;
 import zw.org.zvandiri.business.domain.util.FeaturePlatform;
 
 import javax.persistence.Entity;
@@ -23,6 +24,13 @@ public class FeatureRequest extends BaseEntity{
 
     public FeatureRequest(String id) {
         super(id);
+    }
+
+    public FeatureRequest(FeatureRequestDTO featureRequestDTO) {
+        this.feature = featureRequestDTO.getFeature();
+        this.purpose = featureRequestDTO.getPurpose();
+        this.platform = featureRequestDTO.getPlatform();
+        this.details = featureRequestDTO.getDetails();
     }
 
     public String getFeature() {

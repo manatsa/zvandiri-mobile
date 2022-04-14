@@ -30,6 +30,21 @@ public class UserDTO implements Serializable{
     private District district;
     private String roles;
 
+    public UserDTO() {
+    }
+
+    public UserDTO(User user) {
+        this.id = user.getId();
+        this.version = user.getVersion();
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
+        this.userName = user.getUserName();
+        this.userLevel = user.getUserLevel();
+        this.province = user.getProvince();
+        this.district = user.getDistrict();
+        this.roles = user.getRoles();
+    }
+
     public String getId() {
         return id;
     }

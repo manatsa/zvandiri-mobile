@@ -1,6 +1,8 @@
 package zw.org.zvandiri.business.domain;
 
 
+import zw.org.zvandiri.business.domain.dto.MessageDTO;
+
 import javax.persistence.Entity;
 
 /**
@@ -17,6 +19,11 @@ public class Message extends BaseEntity{
 
     public Message(String id) {
         super(id);
+    }
+
+    public Message(MessageDTO messageDTO) {
+        this.message = messageDTO.getMessage();
+        this.details = messageDTO.getDetails();
     }
 
     public String getMessage() {

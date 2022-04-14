@@ -9,7 +9,7 @@ import zw.org.zvandiri.business.util.StringUtils;
 
 
 public enum FeaturePlatform {
-    ALL(1),WEB(2), MOBILE(3), OTHER(4);
+    BOTH(1),WEB(2), MOBILE(3), OTHER(4);
 
     private final Integer code;
 

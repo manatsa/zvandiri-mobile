@@ -96,6 +96,8 @@ public class MobilePatientResource {
     private FeatureRequestService featureRequestService;
     @Resource
     private MessageService messageService;
+    @Resource
+    private BugReportService bugReportService;
 
 
     @GetMapping("/initial-statics")
@@ -637,19 +639,21 @@ public class MobilePatientResource {
     }
 
     @PostMapping("/add-messages")
-    public ResponseEntity<?> addMesssages(@RequestBody List<Message> messages){
+    public ResponseEntity<?> addMesssages(@RequestBody MessageDTO messageDTO){
         Response response=new Response(200,"Saved successfully","");
         try {
             User user=userService.getCurrentUser();
 
-            for(Message message: messages){
+
+                Message message=new Message(messageDTO);
                 message.setCreatedBy(user);
                 message.setDateCreated(new Date());
                 message.setActive(true);
                 message.setRecordSource(RecordSource.MOBILE_APP);
+                messageService.save(message);
 
-            }
-            System.err.println("\n\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> "+user.getUserName()+" saved Message items :"+messages.size()+"\n\n");
+
+            System.err.println("\n\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> "+user.getUserName()+" saved Message items \n\n");
         } catch (Exception e) {
             e.printStackTrace();
             response.setCode(500);
@@ -662,19 +666,20 @@ public class MobilePatientResource {
     }
 
     @PostMapping("/add-features-request")
-    public ResponseEntity<?> addFeatureRequest(@RequestBody List<FeatureRequest> featureRequests){
+    public ResponseEntity<?> addFeatureRequest(@RequestBody FeatureRequestDTO featureRequestDTO){
         Response response=new Response(200,"Saved successfully","");
         try {
             User user=userService.getCurrentUser();
 
-            for(FeatureRequest featureRequest: featureRequests){
+
+                FeatureRequest featureRequest=new FeatureRequest(featureRequestDTO);
                 featureRequest.setCreatedBy(user);
                 featureRequest.setDateCreated(new Date());
                 featureRequest.setActive(true);
                 featureRequest.setRecordSource(RecordSource.MOBILE_APP);
 
-            }
-            System.err.println("\n\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> "+user.getUserName()+" saved Feature request items :"+featureRequests.size()+"\n\n");
+                featureRequestService.save(featureRequest);
+            System.err.println("\n\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> "+user.getUserName()+" saved Feature request item \n\n");
         } catch (Exception e) {
             e.printStackTrace();
             response.setCode(500);
@@ -686,14 +691,70 @@ public class MobilePatientResource {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/get-messages")
-    public ResponseEntity<?> getMessages(){
+    @PostMapping("/add-bug-reports")
+    public ResponseEntity<?> addBugReports(@RequestBody BugReportDTO bugReportDTO){
         Response response=new Response(200,"Saved successfully","");
-        List<Message> messages=new ArrayList<>();
         try {
             User user=userService.getCurrentUser();
 
-            messages=messageService.getAllByCreatedBy(user);
+
+                BugReport bugReport= new BugReport(bugReportDTO);
+                bugReport.setCreatedBy(user);
+                bugReport.setDateCreated(new Date());
+                bugReport.setActive(true);
+                bugReport.setRecordSource(RecordSource.MOBILE_APP);
+                if(bugReport.getStatus()==null || bugReport.getStatus().toString().isEmpty()){
+                    bugReport.setStatus(BugStatus.PENDING);
+                }
+
+                bugReportService.save(bugReport);
+
+            System.err.println("\n\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> "+user.getUserName()+" saved Bug Report item \n");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setCode(500);
+            response.setMessage(e.getMessage());
+            response.setDescription(e.getLocalizedMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/get-all-bug-reports")
+    public ResponseEntity<?> getBugReports(@RequestParam("all") Boolean all){
+        Response response=new Response(200,"Saved successfully","");
+        List<BugReportDTO> bugReports=new ArrayList<>();
+        try {
+            User user=userService.getCurrentUser();
+            System.err.println("ALL : "+all);
+            List<BugReport> bugReports1=bugReportService.getAllByCreatedBy(user);
+            for(BugReport bugReport: bugReports1){
+                bugReports.add(new BugReportDTO(bugReport));
+            }
+            System.err.println("\n\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> "+user.getUserName()+" pulled Bug Report items :"+bugReports.size()+"\n\n");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setCode(500);
+            response.setMessage(e.getMessage());
+            response.setDescription(e.getLocalizedMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(bugReports, HttpStatus.OK);
+    }
+
+    @GetMapping("/get-messages")
+    public ResponseEntity<?> getMessages(){
+        Response response=new Response(200,"Saved successfully","");
+        List<MessageDTO> messages=new ArrayList<>();
+        try {
+            User user=userService.getCurrentUser();
+
+            List<Message> messages1=messageService.getAllByCreatedBy(user);
+            for(Message message: messages1){
+                messages.add(new MessageDTO(message));
+            }
             System.err.println("\n\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> "+user.getUserName()+" pulled messages items :"+messages.size()+"\n\n");
         } catch (Exception e) {
             e.printStackTrace();
@@ -709,11 +770,14 @@ public class MobilePatientResource {
     @GetMapping("/get-features-request")
     public ResponseEntity<?> getFeatureRequest(){
         Response response=new Response(200,"Saved successfully","");
-        List<FeatureRequest> featureRequests=new ArrayList<>();
+        List<FeatureRequestDTO> featureRequests=new ArrayList<>();
         try {
             User user=userService.getCurrentUser();
 
-             featureRequests=featureRequestService.getAllByCreatedBy(user);
+             List<FeatureRequest> featureRequests1=featureRequestService.getAllByCreatedBy(user);
+             for(FeatureRequest featureRequest: featureRequests1){
+                 featureRequests.add(new FeatureRequestDTO(featureRequest));
+             }
             System.err.println("\n\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> "+user.getUserName()+" pulled Feature request items :"+featureRequests.size()+"\n\n");
         } catch (Exception e) {
             e.printStackTrace();
