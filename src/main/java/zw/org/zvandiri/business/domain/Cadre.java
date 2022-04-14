@@ -37,7 +37,7 @@ import java.util.Set;
 
 /**
  *
- * @author Judge Muzinda
+ * @author manatsachinyeruse@gmail.com
  */
 @Entity @JsonIgnoreProperties(ignoreUnknown = true)
 /*@Table(indexes = {

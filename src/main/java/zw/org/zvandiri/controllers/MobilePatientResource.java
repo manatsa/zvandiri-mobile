@@ -67,7 +67,7 @@ public class MobilePatientResource {
     @Resource
     private PositionService positionService;
     @Resource
-    TbIptService tbIptService;
+    private TbIptService tbIptService;
     @Resource
     private ServicesReferredService servicesReferredService;
     @Resource
@@ -92,6 +92,10 @@ public class MobilePatientResource {
     private ServiceOfferedService serviceOfferedService;
     @Resource
     private InvestigationTestService investigationTestService;
+    @Resource
+    private FeatureRequestService featureRequestService;
+    @Resource
+    private MessageService messageService;
 
 
     @GetMapping("/initial-statics")
@@ -630,6 +634,96 @@ public class MobilePatientResource {
         }
 
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/add-messages")
+    public ResponseEntity<?> addMesssages(@RequestBody List<Message> messages){
+        Response response=new Response(200,"Saved successfully","");
+        try {
+            User user=userService.getCurrentUser();
+
+            for(Message message: messages){
+                message.setCreatedBy(user);
+                message.setDateCreated(new Date());
+                message.setActive(true);
+                message.setRecordSource(RecordSource.MOBILE_APP);
+
+            }
+            System.err.println("\n\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> "+user.getUserName()+" saved Message items :"+messages.size()+"\n\n");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setCode(500);
+            response.setMessage(e.getMessage());
+            response.setDescription(e.getLocalizedMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/add-features-request")
+    public ResponseEntity<?> addFeatureRequest(@RequestBody List<FeatureRequest> featureRequests){
+        Response response=new Response(200,"Saved successfully","");
+        try {
+            User user=userService.getCurrentUser();
+
+            for(FeatureRequest featureRequest: featureRequests){
+                featureRequest.setCreatedBy(user);
+                featureRequest.setDateCreated(new Date());
+                featureRequest.setActive(true);
+                featureRequest.setRecordSource(RecordSource.MOBILE_APP);
+
+            }
+            System.err.println("\n\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> "+user.getUserName()+" saved Feature request items :"+featureRequests.size()+"\n\n");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setCode(500);
+            response.setMessage(e.getMessage());
+            response.setDescription(e.getLocalizedMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/get-messages")
+    public ResponseEntity<?> getMessages(){
+        Response response=new Response(200,"Saved successfully","");
+        List<Message> messages=new ArrayList<>();
+        try {
+            User user=userService.getCurrentUser();
+
+            messages=messageService.getAllByCreatedBy(user);
+            System.err.println("\n\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> "+user.getUserName()+" pulled messages items :"+messages.size()+"\n\n");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setCode(500);
+            response.setMessage(e.getMessage());
+            response.setDescription(e.getLocalizedMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(messages, HttpStatus.OK);
+    }
+
+    @GetMapping("/get-features-request")
+    public ResponseEntity<?> getFeatureRequest(){
+        Response response=new Response(200,"Saved successfully","");
+        List<FeatureRequest> featureRequests=new ArrayList<>();
+        try {
+            User user=userService.getCurrentUser();
+
+             featureRequests=featureRequestService.getAllByCreatedBy(user);
+            System.err.println("\n\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> "+user.getUserName()+" pulled Feature request items :"+featureRequests.size()+"\n\n");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setCode(500);
+            response.setMessage(e.getMessage());
+            response.setDescription(e.getLocalizedMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(featureRequests, HttpStatus.OK);
     }
 
 }
