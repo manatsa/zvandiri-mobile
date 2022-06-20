@@ -35,7 +35,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class PatientHistory extends GenericPatient {
     
     @ManyToOne
-    @JoinColumn(name="patient", updatable = false, insertable = false)
+    @JoinColumn(name="patient")
     private Patient patient;
 
     public PatientHistory() {

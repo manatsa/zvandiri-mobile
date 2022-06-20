@@ -5,7 +5,10 @@
  */
 package zw.org.zvandiri.business.service;
 
+import java.util.Date;
 import java.util.List;
+
+import zw.org.zvandiri.business.domain.Contact;
 import zw.org.zvandiri.business.domain.Patient;
 import zw.org.zvandiri.business.domain.TbIpt;
 import zw.org.zvandiri.business.domain.util.TbIdentificationOutcome;
@@ -25,5 +28,9 @@ public interface TbIptService extends GenericService<TbIpt> {
     List<TbIpt> getByPatient(Patient patient);
     
     TbIpt getLatest(Patient patient);
+
+    public List<TbIpt> findByDistrictInGivenTime(Date start, Date end, String district);
+
+    public List<TbIpt> findByFacilityInGivenTime(Date start, Date end, String facility);
 
 }

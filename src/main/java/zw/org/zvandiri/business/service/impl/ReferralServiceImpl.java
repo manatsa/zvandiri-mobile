@@ -90,4 +90,14 @@ public class ReferralServiceImpl implements ReferralService {
     public List<Referral> getByPatient(Patient patient) {
         return referralRepo.findByPatient(patient);
     }
+
+    @Override
+    public List<Referral> findByDistrictInGivenTime(Date start, Date end, String district) {
+        return referralRepo.findByDistrictInGivenTime(start, end, district);
+    }
+
+    @Override
+    public List<Referral> findByFacilityInGivenTime(Date start, Date end, String facility) {
+        return referralRepo.findByFacilityInGivenTime(start, end, facility);
+    }
 }

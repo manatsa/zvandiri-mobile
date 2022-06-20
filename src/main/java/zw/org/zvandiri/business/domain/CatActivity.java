@@ -29,7 +29,7 @@ import zw.org.zvandiri.business.domain.util.YesNo;
 public class CatActivity extends BaseEntity {
     
     @ManyToOne
-    @JoinColumn(name="cat_detail", updatable = false, insertable = false)
+    @JoinColumn(name="cat_detail")
     private CatDetail catDetail;
     private String certificateNumber;
     @Temporal(TemporalType.DATE)

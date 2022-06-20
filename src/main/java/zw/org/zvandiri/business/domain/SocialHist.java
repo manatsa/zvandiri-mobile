@@ -37,11 +37,11 @@ public class SocialHist extends BaseEntity {
 
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name="patient", updatable = false, insertable = false)
+    @JoinColumn(name="patient")
     private Patient patient;
     private String liveWith;
     @ManyToOne
-    @JoinColumn(name="relationship", updatable = false, insertable = false)
+    @JoinColumn(name="relationship")
     private Relationship relationship;
     @Enumerated
     private YesNo abuse;

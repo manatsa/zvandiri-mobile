@@ -30,7 +30,7 @@ public class Person extends BaseEntity{
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date dateOfBirth;
     @ManyToOne
-    @JoinColumn(name="district", updatable = false, insertable = false)
+    @JoinColumn(name="district")
     private District district;
     @Transient
     private Province province;

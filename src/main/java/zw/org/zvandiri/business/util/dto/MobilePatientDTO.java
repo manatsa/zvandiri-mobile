@@ -33,7 +33,6 @@ public class MobilePatientDTO implements Serializable {
     private String facility;
     private String district;
     private String province;
-    private Integer vlResult;
     private Integer enhancedStatus;
     private ClientType clientType;
 
@@ -58,7 +57,6 @@ public class MobilePatientDTO implements Serializable {
         this.active = patient.getActive();
         this.primaryClinicId=patient.getPrimaryClinic().getId();
         this.clientType=patient.getClientType();
-        this.vlResult=patient.getViralLoad();
         this.enhancedStatus=patient.getEnhancedStatus();
         this.facility=patient.getPrimaryClinic().getName();
         this.district=patient.getPrimaryClinic().getDistrict().getName();
@@ -74,7 +72,6 @@ public class MobilePatientDTO implements Serializable {
         this.active = patient.getActive();
         this.primaryClinicId=patient.getPrimaryClinic().getId();
         this.clientType=patient.getClientType();
-        this.vlResult=patient.getViralLoad();
         this.enhancedStatus=patient.getEnhancedStatus();
         this.facility=patient.getPrimaryClinic().getName();
         this.district=patient.getPrimaryClinic().getDistrict().getName();
@@ -171,14 +168,6 @@ public class MobilePatientDTO implements Serializable {
         this.province = province;
     }
 
-    public Integer getVlResult() {
-        return vlResult;
-    }
-
-    public void setVlResult(Integer vlResult) {
-        this.vlResult = vlResult;
-    }
-
     public Integer getEnhancedStatus() {
         return enhancedStatus;
     }
@@ -196,7 +185,6 @@ public class MobilePatientDTO implements Serializable {
     }
 
 
-
     @Override
     public String toString() {
         return "MobilePatientDTO{" +
@@ -207,6 +195,12 @@ public class MobilePatientDTO implements Serializable {
                 ", status=" + status +
                 ", active=" + active +
                 ", primaryClinicId='" + primaryClinicId + '\'' +
+                ", facility='" + facility + '\'' +
+                ", district='" + district + '\'' +
+                ", province='" + province + '\'' +
+                ", enhancedStatus=" + enhancedStatus +
+                ", clientType=" + clientType +
+                ", patientService=" + patientService +
                 '}';
     }
 }

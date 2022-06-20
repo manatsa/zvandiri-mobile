@@ -419,5 +419,15 @@ public class PatientServiceImpl implements PatientService {
         return  patientRepo.getActiveByProvince(province);
     }
 
+    @Override
+    public List<Patient> findByDistrictInGivenTime(Date start, Date end, String district) {
+        return patientRepo.findByDistrictInGivenTime(start, end, district);
+    }
+
+    @Override
+    public List<Patient> findByFacilityInGivenTime(Date start, Date end, String facility) {
+        return patientRepo.findByFacilityInGivenTime(start, end, facility);
+    }
+
 
 }

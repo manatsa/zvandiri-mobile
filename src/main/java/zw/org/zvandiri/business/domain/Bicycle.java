@@ -30,7 +30,7 @@ public class Bicycle extends BaseEntity{
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date dateRecovered;
     @OneToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name="cadre", updatable = false, insertable = false)
+    @JoinColumn(name="cadre")
     private Cadre cadre;
 
     public Bicycle(String type, Condition condition, PhoneStatus bikeStatus, Date dateIssued, Date dateRecovered, Cadre cadre) {

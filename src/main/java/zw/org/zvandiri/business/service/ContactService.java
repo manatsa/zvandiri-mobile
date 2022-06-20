@@ -17,6 +17,8 @@ package zw.org.zvandiri.business.service;
 
 import java.util.Date;
 import java.util.List;
+
+import org.springframework.web.bind.annotation.RequestParam;
 import zw.org.zvandiri.business.domain.Contact;
 import zw.org.zvandiri.business.domain.Patient;
 import zw.org.zvandiri.business.domain.User;
@@ -36,4 +38,8 @@ public interface ContactService extends GenericService<Contact> {
     public Contact findLatestContact(Patient patient);
     
     public void saveContactDTO(Contact contact);
+
+    public List<Contact> findByDistrictInGivenTime(Date start, Date end, String district);
+
+    public List<Contact> findByFacilityInGivenTime(Date start, Date end, String facility);
 }

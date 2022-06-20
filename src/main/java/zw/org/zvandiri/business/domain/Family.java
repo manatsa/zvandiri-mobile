@@ -30,10 +30,10 @@ public class Family extends BaseEntity {
     
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name="patient", updatable = false, insertable = false)
+    @JoinColumn(name="patient")
     private Patient patient;
     @ManyToOne
-    @JoinColumn(name="orphan_status", updatable = false, insertable = false)
+    @JoinColumn(name="orphan_status")
     private OrphanStatus orphanStatus;
     private Integer numberOfSiblings;
 

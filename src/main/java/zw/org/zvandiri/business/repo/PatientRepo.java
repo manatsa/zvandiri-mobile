@@ -22,10 +22,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import zw.org.zvandiri.business.domain.District;
-import zw.org.zvandiri.business.domain.Facility;
-import zw.org.zvandiri.business.domain.Patient;
-import zw.org.zvandiri.business.domain.Province;
+import org.springframework.web.bind.annotation.RequestParam;
+import zw.org.zvandiri.business.domain.*;
 import zw.org.zvandiri.business.domain.util.Gender;
 import zw.org.zvandiri.business.util.PatientInnerJoin;
 
@@ -132,7 +130,7 @@ public interface PatientRepo extends JpaRepository<Patient, String> {
 
 
     @Query("select p from Patient p where " +
-            "p.id not in (select c.patient from Contact c  where (c.dateCreated between :start and :end)  and p.primaryClinic.district=:district )")
+            "p.id not in (select c.patient from Contact c  where (c.dateCreated between :start and :end)  and p.primaryClinic.district=:district ) order by  p.lastName, p.firstName ASC")
     public List<Patient> getUncontactedDistrict(@Param("start") Date start, @Param("end") Date date, @Param("district") District district);
 
     public  List<Patient> getAllByPrimaryClinicAndActive(@Param("facility") Facility primaryClinic, @Param("active") boolean active);
@@ -143,5 +141,10 @@ public interface PatientRepo extends JpaRepository<Patient, String> {
     @Query("select distinct p from Patient p where p.active=true and p.status=5 and p.primaryClinic.district.province=:province")
     List<Patient> getActiveByProvince(@Param("province") Province province);
 
-    
+    @Query("select distinct  p from Patient p where p.primaryClinic.id=:facility and p.dateCreated between  :start and :end order by  p.lastName, p.firstName ASC")
+    List<Patient> findByFacilityInGivenTime(@RequestParam("start") Date start, @RequestParam("end") Date end, @RequestParam("facility") String facility);
+
+    @Query("select distinct  p from Patient p where p.primaryClinic.district.id=:district and p.dateCreated between  :start and :end ")
+    List<Patient> findByDistrictInGivenTime(@RequestParam("start") Date start, @RequestParam("end") Date end, @RequestParam("district") String district);
+
 }

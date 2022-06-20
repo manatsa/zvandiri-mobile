@@ -22,8 +22,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import zw.org.zvandiri.business.domain.Patient;
-import zw.org.zvandiri.business.domain.Referral;
+import org.springframework.web.bind.annotation.RequestParam;
+import zw.org.zvandiri.business.domain.*;
 
 /**
  *
@@ -39,4 +39,20 @@ public interface ReferralRepo extends JpaRepository<Referral, String> {
             @Param("start") Date start, @Param("end") Date end);
 
     List<Referral> findByActive(@Param("active")Boolean aTrue);
+
+    @Query("select distinct  i from Referral i where i.patient.primaryClinic.id=:facility and i.dateCreated between  :start and :end ")
+    List<Referral> findByFacilityInGivenTime(@RequestParam("start") Date start, @RequestParam("end") Date end, @RequestParam("facility") String facility);
+
+    @Query("select distinct  i from Referral i where i.patient.primaryClinic.district.id=:district and i.dateCreated between  :start and :end ")
+    List<Referral> findByDistrictInGivenTime(@RequestParam("start") Date start, @RequestParam("end") Date end, @RequestParam("district") String district);
+
+//    @Query("Select Distinct(r) from Referral r  where r.patient=:patient and (r.referralDate) between :start and :end")
+    public List<Referral> findByPatientAndReferralDateBetween(
+            @Param("patient") Patient patient,
+            @Param("start") Date start, @Param("end") Date end);
+
+    @Query("Select Distinct(r) from Referral r left join  fetch  r.patient p where p.primaryClinic=:facility and (r.referralDate) between :start and :end order by  p.lastName ASC, p.firstName ASC, r.dateCreated DESC")
+    public List<Referral> findByFacilityAndReferralDateBetween(
+            @Param("facility") Facility facility,
+            @Param("start") Date start, @Param("end") Date end);
 }

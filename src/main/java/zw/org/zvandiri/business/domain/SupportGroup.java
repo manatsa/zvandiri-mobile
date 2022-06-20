@@ -36,7 +36,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class SupportGroup extends BaseName {
     
     @ManyToOne
-    @JoinColumn(name="district", updatable = false, insertable = false)
+    @JoinColumn(name="district")
     private District district;
     @Transient
     private Province province;
@@ -73,5 +73,15 @@ public class SupportGroup extends BaseName {
 
     public void setPatients(Set<Patient> patients) {
         this.patients = patients;
+    }
+
+    @Override
+    public String toString() {
+        return "SupportGroup{" +
+                "id="+getId()+
+                "name=      "+getName()+
+                "district=" + district.getName() +
+
+                '}';
     }
 }

@@ -5,7 +5,10 @@
  */
 package zw.org.zvandiri.business.service;
 
+import java.util.Date;
 import java.util.List;
+
+import zw.org.zvandiri.business.domain.Contact;
 import zw.org.zvandiri.business.domain.MentalHealthScreening;
 import zw.org.zvandiri.business.domain.Patient;
 import zw.org.zvandiri.business.util.dto.SearchDTO;
@@ -18,4 +21,8 @@ public interface MentalHealthScreeningService extends GenericPatientHistoryServi
     List<MentalHealthScreening> findByPatient(Patient patient);
     public List<MentalHealthScreening> get(SearchDTO dto);
     Long count(SearchDTO dto);
+
+    public List<MentalHealthScreening> findByDistrictInGivenTime(Date start, Date end, String district);
+
+    public List<MentalHealthScreening> findByFacilityInGivenTime(Date start, Date end, String facility);
 }

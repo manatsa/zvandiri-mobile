@@ -42,10 +42,10 @@ public class SubstanceItem extends BaseEntity {
     
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name="patient", updatable = false, insertable = false)
+    @JoinColumn(name="patient")
     private Patient patient;
     @ManyToOne
-    @JoinColumn(name="substance", updatable = false, insertable = false)
+    @JoinColumn(name="substance")
     private Substance substance;
     @Enumerated
     private YesNo current;

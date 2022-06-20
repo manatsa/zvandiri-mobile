@@ -47,7 +47,7 @@ public class GenericPatient extends BaseEntity {
     private YesNo consentToMHealth;
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name="period", updatable = false, insertable = false)
+    @JoinColumn(name="period")
     private Period period;
     private String address;
     private String address1;
@@ -56,23 +56,23 @@ public class GenericPatient extends BaseEntity {
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date dateOfBirth;
     @ManyToOne
-    @JoinColumn(name="education", updatable = false, insertable = false)
+    @JoinColumn(name="education")
     private Education education;
     @ManyToOne
-    @JoinColumn(name="education_level", updatable = false, insertable = false)
+    @JoinColumn(name="education_level")
     private EducationLevel educationLevel;
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date dateJoined;
     @ManyToOne
-    @JoinColumn(name="referer", updatable = false, insertable = false)
+    @JoinColumn(name="referer")
     private Referer referer;
     
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="primary_clinic", updatable = false, insertable = false)
+    @JoinColumn(name="primary_clinic")
     private Facility primaryClinic;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="support_group", updatable = false, insertable = false)
+    @JoinColumn(name="support_group")
     private SupportGroup supportGroup;
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd/MM/yyyy")
@@ -94,20 +94,20 @@ public class GenericPatient extends BaseEntity {
     private String pmobileNumber;
     private Gender pgender;
     @ManyToOne
-    @JoinColumn(name="relationship", updatable = false, insertable = false)
+    @JoinColumn(name="relationship")
     private Relationship relationship;
     private String secondaryMobileNumber;
     @Enumerated
     private YesNo mobileOwner;
     private String ownerName;
     @ManyToOne
-    @JoinColumn(name="mobile_Owner_relation", updatable = false, insertable = false)
+    @JoinColumn(name="mobile_Owner_relation")
     private Relationship mobileOwnerRelation;
     @Enumerated
     private YesNo ownSecondaryMobile;
     private String secondaryMobileOwnerName;
     @ManyToOne
-    @JoinColumn(name="secondary_mobileowner_relation", updatable = false, insertable = false)
+    @JoinColumn(name="secondary_mobileowner_relation")
     private Relationship secondaryMobileownerRelation;
     @Enumerated
     private TransmissionMode transmissionMode;
@@ -120,7 +120,7 @@ public class GenericPatient extends BaseEntity {
     @Transient
     private Boolean heuReg;
     @ManyToOne
-    @JoinColumn(name="mother_of_hei", updatable = false, insertable = false)
+    @JoinColumn(name="mother_of_hei")
     private Patient motherOfHei;
     @Enumerated
     private PatientChangeEvent status = PatientChangeEvent.ACTIVE;
@@ -188,7 +188,7 @@ public class GenericPatient extends BaseEntity {
      new fields
      */
     @ManyToOne
-    @JoinColumn(name="reason_for_not_reachingolevel", updatable = false, insertable = false)
+    @JoinColumn(name="reason_for_not_reachingolevel")
     private ReasonForNotReachingOLevel reasonForNotReachingOLevel;
     private String refererName;
     private String oINumber;

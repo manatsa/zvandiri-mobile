@@ -15,6 +15,7 @@ import java.util.Date;
 
 
 public class PatientDTO {
+    private String id;
     @Enumerated
     private YesNo haveBirthCertificate;
 
@@ -132,11 +133,15 @@ public class PatientDTO {
     private String reasonForNotReachingOLevel;
     private String refererName;
     private String oINumber;
+    @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    private Date dateCreated;
 
     public PatientDTO() {
     }
 
     public PatientDTO(Patient patient) {
+        this.id=patient.getId();
         this.haveBirthCertificate = patient.getHaveBirthCertificate();
         this.IDNumber = patient.getIDNumber();
         this.maritalStatus = patient.getMaritalStatus();
@@ -151,7 +156,6 @@ public class PatientDTO {
         this.disablityType = patient.getDisablityType();
         this.clientType = patient.getClientType();
         this.firstName = patient.getFirstName();
-        this.middleName = patient.getMiddleName();
         this.lastName = patient.getLastName();
         this.gender = patient.getGender();
         this.consentToMHealth = patient.getConsentToMHealth();
@@ -172,7 +176,11 @@ public class PatientDTO {
         this.plastName = patient.getPlastName();
         this.pmobileNumber = patient.getPmobileNumber();
         this.pgender = patient.getPgender();
-        this.relationship = patient.getRelationship().getId();
+        try{
+            this.middleName = patient.getMiddleName();
+            this.relationship = patient.getRelationship().getId();
+        }catch(Exception e){}
+
         this.secondaryMobileNumber = patient.getSecondaryMobileNumber();
         this.mobileOwner = patient.getMobileOwner();
         this.ownerName = patient.getOwnerName();
@@ -186,6 +194,15 @@ public class PatientDTO {
         this.reasonForNotReachingOLevel = (patient.getReasonForNotReachingOLevel()!=null)?patient.getReasonForNotReachingOLevel().getId():null;
         this.refererName = patient.getRefererName();
         this.oINumber = patient.getoINumber();
+        this.dateCreated=patient.getDateCreated();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public YesNo getHaveBirthCertificate() {
@@ -578,5 +595,70 @@ public class PatientDTO {
 
     public void setReasonForNotReachingOLevel(String reasonForNotReachingOLevel) {
         this.reasonForNotReachingOLevel = reasonForNotReachingOLevel;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    @Override
+    public String toString() {
+        return "PatientDTO{" +
+                "id='" + id + '\'' +
+                ", haveBirthCertificate=" + haveBirthCertificate +
+                ", IDNumber='" + IDNumber + '\'' +
+                ", maritalStatus=" + maritalStatus +
+                ", orphanStatus=" + orphanStatus +
+                ", onArvs=" + onArvs +
+                ", onCotrimoxazole=" + onCotrimoxazole +
+                ", dateStartedTreatment=" + dateStartedTreatment +
+                ", disclosureType=" + disclosureType +
+                ", artRegimen='" + artRegimen + '\'' +
+                ", isKeypopulation=" + isKeypopulation +
+                ", keyPopulation=" + keyPopulation +
+                ", disablityType='" + disablityType + '\'' +
+                ", clientType=" + clientType +
+                ", firstName='" + firstName + '\'' +
+                ", middleName='" + middleName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", gender=" + gender +
+                ", consentToMHealth=" + consentToMHealth +
+                ", address='" + address + '\'' +
+                ", mobileNumber='" + mobileNumber + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", education='" + education + '\'' +
+                ", educationLevel='" + educationLevel + '\'' +
+                ", dateJoined=" + dateJoined +
+                ", referer='" + referer + '\'' +
+                ", primaryClinic='" + primaryClinic + '\'' +
+                ", supportGroup='" + supportGroup + '\'' +
+                ", dateTested=" + dateTested +
+                ", hIVDisclosureLocation=" + hIVDisclosureLocation +
+                ", disability=" + disability +
+                ", selfPrimaryCareGiver=" + selfPrimaryCareGiver +
+                ", pfirstName='" + pfirstName + '\'' +
+                ", plastName='" + plastName + '\'' +
+                ", pmobileNumber='" + pmobileNumber + '\'' +
+                ", pgender=" + pgender +
+                ", relationship='" + relationship + '\'' +
+                ", secondaryMobileNumber='" + secondaryMobileNumber + '\'' +
+                ", mobileOwner=" + mobileOwner +
+                ", ownerName='" + ownerName + '\'' +
+                ", mobileOwnerRelation='" + mobileOwnerRelation + '\'' +
+                ", ownSecondaryMobile=" + ownSecondaryMobile +
+                ", secondaryMobileOwnerName='" + secondaryMobileOwnerName + '\'' +
+                ", secondaryMobileownerRelation='" + secondaryMobileownerRelation + '\'' +
+                ", transmissionMode=" + transmissionMode +
+                ", hivStatusKnown=" + hivStatusKnown +
+                ", status=" + status +
+                ", reasonForNotReachingOLevel='" + reasonForNotReachingOLevel + '\'' +
+                ", refererName='" + refererName + '\'' +
+                ", oINumber='" + oINumber + '\'' +
+                ", dateCreated=" + dateCreated +
+                '}';
     }
 }

@@ -1,6 +1,7 @@
 package zw.org.zvandiri.business.domain.dto;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import zw.org.zvandiri.business.domain.Contact;
 import zw.org.zvandiri.business.domain.Location;
 import zw.org.zvandiri.business.domain.Patient;
 import zw.org.zvandiri.business.domain.Position;
@@ -15,6 +16,7 @@ import javax.persistence.TemporalType;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -23,6 +25,7 @@ import java.util.Set;
 
 public class ContactDTO {
 
+    private String id;
     private String patient;
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd/MM/yyyy")
@@ -57,8 +60,54 @@ public class ContactDTO {
     private String contactMadeBy;
     private String supportGroupTheme;
     private String userID;
+    @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    private Date dateCreated;
+    private String  pname;
 
 
+    public ContactDTO() {
+    }
+
+    public ContactDTO(Contact contact) {
+        this.id=contact.getId();
+        this.patient = contact.getPatient().getId();
+        this.contactDate = contact.getContactDate();
+        this.nextClinicAppointmentDate = contact.getNextClinicAppointmentDate();
+        this.careLevel = contact.getCareLevel();
+        this.careLevelAfterAssessment = contact.getCareLevelAfterAssessment();
+        this.systemDeterminedCareLevel = contact.getSystemDeterminedCareLevel();
+        this.location = contact.getLocation().getId();
+        this.contactPhoneOption = contact.getContactPhoneOption();
+        this.numberOfSms = contact.getNumberOfSms();
+        this.position = contact.getPosition().getId();
+        this.pname=contact.getPatient().getName();
+
+        try{
+            this.clinicalAssessments = contact.getClinicalAssessments().stream().map(assessment -> assessment.getId()).collect(Collectors.toSet());
+            this.nonClinicalAssessments = contact.getNonClinicalAssessments().stream().map(assessment -> assessment.getId()).collect(Collectors.toSet());
+            this.serviceOffereds = contact.getServiceOffereds().stream().map(serviceOffered -> serviceOffered.getId()).collect(Collectors.toSet());
+            this.servicereferreds = contact.getServicereferreds().stream().map(servicesReferred -> servicesReferred.getId()).collect(Collectors.toSet());
+        }catch(Exception e){}
+
+        this.lastClinicAppointmentDate = contact.getLastClinicAppointmentDate();
+        this.attendedClinicAppointment = contact.getAttendedClinicAppointment();
+        this.eac = contact.getEac();
+        this.eac1 = contact.getEac1();
+        this.eac2 = contact.getEac2();
+        this.eac3 = contact.getEac3();
+        this.contactMadeBy = contact.getContactMadeBy();
+        this.supportGroupTheme = contact.getSupportGroupTheme();
+        this.dateCreated = contact.getDateCreated();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getPatient() {
         return patient;
@@ -244,15 +293,52 @@ public class ContactDTO {
         this.userID = userID;
     }
 
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public String getPname() {
+        return pname;
+    }
+
+    public void setPname(String pname) {
+        this.pname = pname;
+    }
+
     @Override
     public String toString() {
-        return super.toString().concat("Contact{" + "patient=" + patient + ", contactDate=" + contactDate + ", nextClinicAppointmentDate=" +
-                nextClinicAppointmentDate + ", careLevel=" + careLevel + ", location=" + location + ", contactPhoneOption=" +
-                contactPhoneOption + ", numberOfSms=" + numberOfSms + ", position=" + position   +
-                ", clinicalAssessments=" + clinicalAssessments + ", nonClinicalAssessments=" + nonClinicalAssessments + ", serviceOffereds=" + serviceOffereds
-                + ", lastClinicAppointmentDate=" + lastClinicAppointmentDate + ", attendedClinicAppointment=" + attendedClinicAppointment +
-                ", careLevelAfterAssessment ="+careLevelAfterAssessment+", EAC="+eac+", eac1="+eac1+",eac2="+eac2+",eac3="+eac3+",contactMadeBy="+contactMadeBy+
-                ", SystemDeterminedCareLevel = "+systemDeterminedCareLevel+"}");
+        return "ContactDTO{" +
+                "id='" + id + '\'' +
+                ", patient='" + patient + '\'' +
+                ", contactDate=" + contactDate +
+                ", nextClinicAppointmentDate=" + nextClinicAppointmentDate +
+                ", careLevel=" + careLevel +
+                ", careLevelAfterAssessment=" + careLevelAfterAssessment +
+                ", systemDeterminedCareLevel=" + systemDeterminedCareLevel +
+                ", location='" + location + '\'' +
+                ", contactPhoneOption=" + contactPhoneOption +
+                ", numberOfSms=" + numberOfSms +
+                ", position='" + position + '\'' +
+                ", clinicalAssessments=" + clinicalAssessments +
+                ", nonClinicalAssessments=" + nonClinicalAssessments +
+                ", serviceOffereds=" + serviceOffereds +
+                ", servicereferreds=" + servicereferreds +
+                ", lastClinicAppointmentDate=" + lastClinicAppointmentDate +
+                ", attendedClinicAppointment=" + attendedClinicAppointment +
+                ", eac=" + eac +
+                ", eac1=" + eac1 +
+                ", eac2=" + eac2 +
+                ", eac3=" + eac3 +
+                ", contactMadeBy='" + contactMadeBy + '\'' +
+                ", supportGroupTheme='" + supportGroupTheme + '\'' +
+                ", userID='" + userID + '\'' +
+                ", dateCreated=" + dateCreated +
+                ", pname='" + pname + '\'' +
+                '}';
     }
 
 }

@@ -39,10 +39,10 @@ public class MentalHealthItem extends BaseEntity {
     
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name="patient", updatable = false, insertable = false)
+    @JoinColumn(name="patient")
     private Patient patient;
     @ManyToOne
-    @JoinColumn(name="mental_health", updatable = false, insertable = false)
+    @JoinColumn(name="mental_health")
     private MentalHealth mentalHealth;
     private String past;
     private String current;

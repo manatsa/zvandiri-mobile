@@ -15,12 +15,19 @@
  */
 package zw.org.zvandiri.business.service;
 
+import zw.org.zvandiri.business.domain.Contact;
 import zw.org.zvandiri.business.domain.Referral;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  *
  * @author Judge Muzinda
  */
 public interface ReferralService extends GenericPatientService<Referral> {
-    
+
+    public List<Referral> findByDistrictInGivenTime(Date start, Date end, String district);
+
+    public List<Referral> findByFacilityInGivenTime(Date start, Date end, String facility);
 }

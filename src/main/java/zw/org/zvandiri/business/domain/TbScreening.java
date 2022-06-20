@@ -47,7 +47,7 @@ public class TbScreening extends BaseEntity {
     @Enumerated
     private TbTreatmentOutcome tbTreatmentOutcome;
     @ManyToOne
-    @JoinColumn(name="patient", updatable = false, insertable = false)
+    @JoinColumn(name="patient")
     private Patient patient;
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd/MM/yyyy")

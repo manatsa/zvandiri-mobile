@@ -5,13 +5,14 @@
  */
 package zw.org.zvandiri.business.repo;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import zw.org.zvandiri.business.domain.Patient;
-import zw.org.zvandiri.business.domain.TbIpt;
+import org.springframework.web.bind.annotation.RequestParam;
+import zw.org.zvandiri.business.domain.*;
 import zw.org.zvandiri.business.domain.util.TbIdentificationOutcome;
 
 /**
@@ -31,4 +32,20 @@ public interface TbIptRepo extends JpaRepository<TbIpt, String> {
     List<TbIpt> findByPatientOrderByDateCreatedDesc(Patient patient);
 
     List<TbIpt> findByActive(@Param("active")Boolean aTrue);
+
+    @Query("select distinct  i from TbIpt i where i.patient.primaryClinic.id=:facility and i.dateCreated between  :start and :end ")
+    List<TbIpt> findByFacilityInGivenTime(@RequestParam("start") Date start, @RequestParam("end") Date end, @RequestParam("facility") String facility);
+
+    @Query("select distinct  i from TbIpt i where i.patient.primaryClinic.district.id=:district and i.dateCreated between  :start and :end ")
+    List<TbIpt> findByDistrictInGivenTime(@RequestParam("start") Date start, @RequestParam("end") Date end, @RequestParam("district") String district);
+
+//    @Query("Select Distinct(t) from TbIpt t  where t.patient=:patient and (t.dateScreened) between :start and :end")
+    public List<TbIpt> findByPatientAndDateScreenedBetween(
+            @Param("patient") Patient patient,
+            @Param("start") Date start, @Param("end") Date end);
+
+        @Query("Select Distinct(t) from TbIpt t left join  fetch  t.patient p where p.primaryClinic=:facility  and (t.dateScreened) between :start and :end  order by  p.lastName ASC, p.firstName ASC, t.dateCreated DESC ")
+    public List<TbIpt> findByFacilityAndDateScreenedBetween(
+            @Param("facility") Facility facility,
+            @Param("start") Date start, @Param("end") Date end);
 }

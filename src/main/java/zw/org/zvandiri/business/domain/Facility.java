@@ -30,7 +30,7 @@ import javax.persistence.*;
 public class Facility extends BaseName {
 
     @ManyToOne
-    @JoinColumn(name="district", updatable = false, insertable = false)
+    @JoinColumn(name="district")
     //@JsonIgnoreProperties(value = { "uuid", "createdBy", "modifiedBy", "dateCreated","dateModified","version","deleted","description" })
     private District district;
     @Transient
@@ -62,8 +62,9 @@ public class Facility extends BaseName {
     @Override
     public String toString() {
         return "Facility{" +
-                "district=" + district +
-                ", province=" + province +
+                "id="+getId()+
+                "name="+getName()+
+                "district=" + district.getName() +
                 '}';
     }
 }

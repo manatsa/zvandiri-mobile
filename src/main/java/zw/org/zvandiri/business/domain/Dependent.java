@@ -48,7 +48,7 @@ public class Dependent extends BaseEntity {
     private HIVStatus hivStatus;
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name="patient", updatable = false, insertable = false)
+    @JoinColumn(name="patient")
     private Patient patient;
     @Transient
     private String name;

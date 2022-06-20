@@ -31,6 +31,10 @@ public class ReferralDTO {
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date dateAttended;
+    @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    private Date dateCreated;
+    private String pname;
 
     private Set<ServiceReferredDTO> hivStiServicesReq = new HashSet<>();
 
@@ -72,20 +76,8 @@ public class ReferralDTO {
         this.designation = referral.getDesignation();
         this.attendingOfficer = referral.getAttendingOfficer();
         this.dateAttended = referral.getDateAttended();
-        /*this.hivStiServicesReq = referral.getHivStiServicesReq();
-        this.hivStiServicesAvailed = referral.getHivStiServicesAvailed();
-        this.oiArtReq = referral.getOiArtReq();
-        this.oiArtAvailed = referral.getOiArtAvailed();
-        this.srhReq = referral.getSrhReq();
-        this.srhAvailed = referral.getSrhAvailed();
-        this.laboratoryReq = referral.getLaboratoryReq();
-        this.laboratoryAvailed = referral.getLaboratoryAvailed();
-        this.tbReq = referral.getTbReq();
-        this.tbAvailed = referral.getTbAvailed();
-        this.psychReq = referral.getPsychReq();
-        this.psychAvailed = referral.getPsychAvailed();
-        this.legalReq = referral.getLegalReq();
-        this.legalAvailed = referral.getLegalAvailed();*/
+        this.dateCreated=referral.getDateCreated();
+        this.pname=referral.getPatient().getName();
     }
 
     public String getId() {
@@ -262,6 +254,52 @@ public class ReferralDTO {
 
     public void setLegalAvailed(Set<ServiceReferredDTO> legalAvailed) {
         this.legalAvailed = legalAvailed;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public String getPname() {
+        return pname;
+    }
+
+    public void setPname(String pname) {
+        this.pname = pname;
+    }
+
+    @Override
+    public String toString() {
+        return "ReferralDTO{" +
+                "id='" + id + '\'' +
+                ", patient='" + patient + '\'' +
+                ", referralDate=" + referralDate +
+                ", expectedVisitDate=" + expectedVisitDate +
+                ", organisation='" + organisation + '\'' +
+                ", designation='" + designation + '\'' +
+                ", attendingOfficer='" + attendingOfficer + '\'' +
+                ", dateAttended=" + dateAttended +
+                ", dateCreated=" + dateCreated +
+                ", pname='" + pname + '\'' +
+                ", hivStiServicesReq=" + hivStiServicesReq +
+                ", hivStiServicesAvailed=" + hivStiServicesAvailed +
+                ", oiArtReq=" + oiArtReq +
+                ", oiArtAvailed=" + oiArtAvailed +
+                ", srhReq=" + srhReq +
+                ", srhAvailed=" + srhAvailed +
+                ", laboratoryReq=" + laboratoryReq +
+                ", laboratoryAvailed=" + laboratoryAvailed +
+                ", tbReq=" + tbReq +
+                ", tbAvailed=" + tbAvailed +
+                ", psychReq=" + psychReq +
+                ", psychAvailed=" + psychAvailed +
+                ", legalReq=" + legalReq +
+                ", legalAvailed=" + legalAvailed +
+                '}';
     }
 }
 

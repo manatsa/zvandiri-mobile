@@ -394,5 +394,15 @@ public class InvestigationTestServiceImpl implements InvestigationTestService {
         //query.setMaxResults(dto.getPageSize());
         return (Long)query.getSingleResult();
     }
-    
+
+    @Override
+    public List<InvestigationTest> findByDistrictInGivenTime(Date start, Date end, String district) {
+        return investigationTestRepo.findByDistrictInGivenTime(start, end,district);
+    }
+
+    @Override
+    public List<InvestigationTest> findByFacilityInGivenTime(Date start, Date end, String facility) {
+        return investigationTestRepo.findByFacilityInGivenTime(start, end, facility);
+    }
+
 }

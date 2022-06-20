@@ -30,13 +30,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 public class TreatmentHistory extends BaseEntity {
     
     @ManyToOne
-    @JoinColumn(name="patient", updatable = false, insertable = false)
+    @JoinColumn(name="patient")
     private Patient patient;
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date dateCommenced;
     @ManyToOne
-    @JoinColumn(name="period", updatable = false, insertable = false)
+    @JoinColumn(name="period")
     private Period period;
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd/MM/yyyy")

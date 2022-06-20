@@ -38,7 +38,7 @@ public class ObstercHist extends BaseEntity {
     
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name="patient", updatable = false, insertable = false)
+    @JoinColumn(name="patient")
     private Patient patient;
     @Enumerated
     private YesNo pregnant;

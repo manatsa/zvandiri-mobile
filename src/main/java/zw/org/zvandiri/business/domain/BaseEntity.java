@@ -55,7 +55,7 @@ abstract public class BaseEntity implements Serializable {
     private Boolean active = Boolean.TRUE;
     private Boolean deleted = Boolean.FALSE;
     @Enumerated
-    private RecordSource recordSource = RecordSource.WEB_APP;
+    private RecordSource recordSource = RecordSource.MOBILE_APP;
 
     public BaseEntity() {
 

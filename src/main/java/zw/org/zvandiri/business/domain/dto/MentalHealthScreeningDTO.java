@@ -22,6 +22,7 @@ import java.util.Set;
 
 @ToString
 public class MentalHealthScreeningDTO {
+    private String id;
     private String patient;
     @Enumerated
     private YesNo screenedForMentalHealth;
@@ -38,11 +39,17 @@ public class MentalHealthScreeningDTO {
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date dateScreened;
+    @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    private Date dateCreated;
+    private String pname;
+
 
     public MentalHealthScreeningDTO() {
     }
 
     public MentalHealthScreeningDTO(MentalHealthScreening mentalHealthScreening) {
+        this.id=mentalHealthScreening.getId();
         this.screenedForMentalHealth = mentalHealthScreening.getScreenedForMentalHealth();
         this.risk = mentalHealthScreening.getRisk();
         this.identifiedRisks = mentalHealthScreening.getIdentifiedRisks();
@@ -51,6 +58,16 @@ public class MentalHealthScreeningDTO {
         this.referral = mentalHealthScreening.getReferral();
         this.dateScreened = mentalHealthScreening.getDateScreened();
         this.patient=mentalHealthScreening.getPatient().getId();
+        this.dateCreated=mentalHealthScreening.getDateCreated();
+        this.pname=mentalHealthScreening.getPatient().getName();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getPatient() {
@@ -115,5 +132,38 @@ public class MentalHealthScreeningDTO {
 
     public void setDateScreened(Date dateScreened) {
         this.dateScreened = dateScreened;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public String getPname() {
+        return pname;
+    }
+
+    public void setPname(String pname) {
+        this.pname = pname;
+    }
+
+    @Override
+    public String toString() {
+        return "MentalHealthScreeningDTO{" +
+                "id='" + id + '\'' +
+                ", patient='" + patient + '\'' +
+                ", screenedForMentalHealth=" + screenedForMentalHealth +
+                ", risk=" + risk +
+                ", identifiedRisks=" + identifiedRisks +
+                ", support=" + support +
+                ", supports=" + supports +
+                ", referral=" + referral +
+                ", dateScreened=" + dateScreened +
+                ", dateCreated=" + dateCreated +
+                ", pname='" + pname + '\'' +
+                '}';
     }
 }

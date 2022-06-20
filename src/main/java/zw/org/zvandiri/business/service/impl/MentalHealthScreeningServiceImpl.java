@@ -299,4 +299,14 @@ public class MentalHealthScreeningServiceImpl implements MentalHealthScreeningSe
         return query.getSingleResult();
     }
 
+    @Override
+    public List<MentalHealthScreening> findByDistrictInGivenTime(Date start, Date end, String district) {
+        return repo.findByDistrictInGivenTime(start,end, district);
+    }
+
+    @Override
+    public List<MentalHealthScreening> findByFacilityInGivenTime(Date start, Date end, String facility) {
+        return repo.findByFacilityInGivenTime(start, end, facility);
+    }
+
 }

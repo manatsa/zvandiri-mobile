@@ -55,7 +55,7 @@ public class Mortality extends BaseEntity {
     private String learningPoints;
     private String actionPlan;
     @ManyToOne
-    @JoinColumn(name="patient", updatable = false, insertable = false)
+    @JoinColumn(name="patient")
     private Patient patient;
 
     public Mortality() {

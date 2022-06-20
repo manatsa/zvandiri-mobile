@@ -18,12 +18,8 @@ import java.util.Date;
 public class TestController {
 
     @RequestMapping("/test")
-public NameIdDTO test(){
-        NameIdDTO nameIdDTO=new NameIdDTO();
-        nameIdDTO.setName("Manatsa Chinyeruse");
-        nameIdDTO.setStatus(PatientChangeEvent.ACTIVE);
-        nameIdDTO.setGender(Gender.MALE);
-        nameIdDTO.setDateOfBirth(new Date());
-        return nameIdDTO;
+public String test(){
+
+        return "test";
     }
 }

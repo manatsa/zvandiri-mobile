@@ -36,10 +36,10 @@ public class CatDetail extends BaseEntity {
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="patient", updatable = false, insertable = false)
+    @JoinColumn(name="patient")
     private Patient patient;
     @ManyToOne
-    @JoinColumn(name="primary_clinic", updatable = false, insertable = false)
+    @JoinColumn(name="primary_clinic")
     private Facility primaryClinic;
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd/MM/yyyy")

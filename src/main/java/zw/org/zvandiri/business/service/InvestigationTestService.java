@@ -15,8 +15,10 @@
  */
 package zw.org.zvandiri.business.service;
 
+import java.util.Date;
 import java.util.List;
 
+import zw.org.zvandiri.business.domain.Contact;
 import zw.org.zvandiri.business.domain.InvestigationTest;
 import zw.org.zvandiri.business.domain.Patient;
 import zw.org.zvandiri.business.domain.util.TestType;
@@ -36,5 +38,9 @@ public interface InvestigationTestService extends GenericService<InvestigationTe
 
         public List<InvestigationTest> getInvalidViralLoad(SearchDTO dto);
 
-    Long getInvalidViralLoadCount(SearchDTO dto);
+        Long getInvalidViralLoadCount(SearchDTO dto);
+
+    public List<InvestigationTest> findByDistrictInGivenTime(Date start, Date end, String district);
+
+    public List<InvestigationTest> findByFacilityInGivenTime(Date start, Date end, String facility);
 }

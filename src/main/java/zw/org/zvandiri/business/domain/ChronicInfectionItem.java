@@ -37,10 +37,10 @@ public class ChronicInfectionItem extends BaseEntity {
     
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name="patient", updatable = false, insertable = false)
+    @JoinColumn(name="patient")
     private Patient patient;
     @ManyToOne
-    @JoinColumn(name="chronic_infection", updatable = false, insertable = false)
+    @JoinColumn(name="chronic_infection")
     private ChronicInfection chronicInfection;
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd/MM/yyyy")

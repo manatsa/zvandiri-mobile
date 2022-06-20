@@ -35,7 +35,7 @@ public class SrhHist extends BaseEntity {
  
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name="patient", updatable = false, insertable = false)
+    @JoinColumn(name="patient")
     private Patient patient;
     private Integer ageStartMen;
     private Integer bleedHowOften;

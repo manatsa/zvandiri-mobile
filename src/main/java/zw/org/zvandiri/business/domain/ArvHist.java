@@ -41,16 +41,16 @@ public class ArvHist extends BaseEntity {
 
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name="patient", updatable = false, insertable = false)
+    @JoinColumn(name="patient")
     private Patient patient;
     @ManyToOne
-    @JoinColumn(name="arv_medicine", updatable = false, insertable = false)
+    @JoinColumn(name="arv_medicine")
     private ArvMedicine arvMedicine;
     @ManyToOne
-    @JoinColumn(name="arv_medicine2", updatable = false, insertable = false)
+    @JoinColumn(name="arv_medicine2")
     private ArvMedicine arvMedicine2;
     @ManyToOne
-    @JoinColumn(name="arv_medicine3", updatable = false, insertable = false)
+    @JoinColumn(name="arv_medicine3")
     private ArvMedicine arvMedicine3;
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd/MM/yyyy")

@@ -33,10 +33,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 public class HivConInfectionItem extends BaseEntity {
     
     @ManyToOne
-    @JoinColumn(name="patient", updatable = false, insertable = false)
+    @JoinColumn(name="patient")
     private Patient patient;
     @ManyToOne
-    @JoinColumn(name="hiv_co_infection", updatable = false, insertable = false)
+    @JoinColumn(name="hiv_co_infection")
     private HivCoInfection hivCoInfection;
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd/MM/yyyy")

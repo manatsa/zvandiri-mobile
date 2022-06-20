@@ -20,7 +20,7 @@ public class District extends BaseName {
 
     private static final long serialVersionUID = 1L;
     @ManyToOne
-    @JoinColumn(name="province", updatable = false, insertable = false)
+    @JoinColumn(name="province")
     //@JsonIgnoreProperties(value = { "uuid", "createdBy", "modifiedBy", "dateCreated","dateModified","version","deleted","description" })
     private Province province;
     @OneToMany(mappedBy = "district", cascade = CascadeType.REMOVE)

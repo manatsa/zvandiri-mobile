@@ -75,37 +75,12 @@ public class Patient extends GenericPatient {
     private District supportGroupDistrict;
     @Transient
     private int age = 0;
-    @Transient
-    private String currentElement;
-    @Transient
-    private Boolean patientStatus;
-    @Transient
-    private String patientExist;
+
     @Transient
     private String name;
-    @Formula("(Select c.id From cat_detail c where c.patient = id)")
-    private String catId;
-
-    @Formula("(Select i.result From investigation_test i where i.patient = id and i.test_type = 0 order by i.date_created desc limit 0,1)")
-    private Integer viralLoad;
-
-    @Formula("(Select i.id From investigation_test i where i.patient = id and i.test_type = 0 order by i.date_created desc limit 0,1)")
-    private String lastViralLoad;
-
-    @Formula("(Select i.result From investigation_test i where i.patient = id and i.test_type = 1 order by i.date_created desc limit 0,1)")
-    private Integer cd4Count;
-
-    @Formula("(Select concat(a1.name, ', ', a2.name, ', ', a3.name) From arv_hist a inner join arv_medicine a1 on a1.id=a.arv_medicine inner join arv_medicine a2 on a2.id=a.arv_medicine2 inner join arv_medicine a3 on a3.id=a.arv_medicine3 where a.patient = id order by a.start_date desc limit 0,1)")
-    private String currentArvRegimen;
-
-    @Formula("(Select p.severity From patient_disability p where p.patient = id order by p.date_screened desc limit 0,1)")
-    private Integer disabilitySeverity;
 
     @Formula("(Select c.follow_up From contact c where c.patient = id order by c.date_created desc limit 0,1)")
     private Integer enhancedStatus;
-
-    @Transient
-    private DisabilitySeverity disabilityStatus;
 
     @Enumerated
     private YesNo haveBirthCertificate;
@@ -198,20 +173,7 @@ public class Patient extends GenericPatient {
 
     }
 
-    public InvestigationTest getLastPatientVL(InvestigationTestService investigationTestService) {
 
-        if(lastViralLoad!=null) {
-            if (investigationTestService == null) {
-                System.err.println("last viral load service is null");
-            } else {
-                InvestigationTest test=investigationTestService.get(lastViralLoad);
-                return test;
-            }
-        }
-
-        return null;
-
-    }
 
     public CareLevel getCurrentCareLevelObject(){
         if(this.enhancedStatus==null)
@@ -243,28 +205,12 @@ public class Patient extends GenericPatient {
         this.province = province;
     }
 
-    public String getCurrentElement() {
-        return currentElement;
-    }
-
-    public void setCurrentElement(String currentElement) {
-        this.currentElement = currentElement;
-    }
-
     public District getSupportGroupDistrict() {
         return supportGroupDistrict;
     }
 
     public void setSupportGroupDistrict(District supportGroupDistrict) {
         this.supportGroupDistrict = supportGroupDistrict;
-    }
-
-    public String getLastViralLoad() {
-        return lastViralLoad;
-    }
-
-    public void setLastViralLoad(String lastViralLoad) {
-        this.lastViralLoad = lastViralLoad;
     }
 
     public String getName() {
@@ -296,16 +242,7 @@ public class Patient extends GenericPatient {
         return age;
     }
 
-    public String getPic() {
-        if (getGender() == null) {
-            return "/resources/images/noimage.gif";
-        } else if (getGender().equals(Gender.MALE)) {
-            return "/resources/images/male.gif";
-        } else if (getGender().equals(Gender.FEMALE)) {
-            return "/resources/images/female.gif";
-        }
-        return "/resources/images/noimage.gif";
-    }
+
 
     public String getDateJoin() {
         if (getDateJoined() == null) {
@@ -325,22 +262,6 @@ public class Patient extends GenericPatient {
         this.name = name;
     }
 
-    public String getPatientExist() {
-        return patientExist;
-    }
-
-    public void setPatientExist(String patientExist) {
-        this.patientExist = patientExist;
-    }
-
-    public String getCatId() {
-        return catId;
-    }
-
-    public void setCatId(String catId) {
-        this.catId = catId;
-    }
-
     public String getMother() {
         return getName() + " dob " + DateUtil.zimDate(getDateOfBirth());
     }
@@ -351,14 +272,6 @@ public class Patient extends GenericPatient {
 
     public void setPatientHistories(Set<PatientHistory> patientHistories) {
         this.patientHistories = patientHistories;
-    }
-
-    public Integer getViralLoad() {
-        return viralLoad != null ? viralLoad : 0;
-    }
-
-    public Integer getCd4Count() {
-        return cd4Count != null ? cd4Count : 0;
     }
 
     public MobilePhone getMobilePhone() {
@@ -372,21 +285,6 @@ public class Patient extends GenericPatient {
     public void add(PatientDisability item, Patient patient) {
         disabilityCategorys.add(item);
         item.setPatient(patient);
-    }
-
-    public String getCurrentArvRegimen() {
-        return currentArvRegimen;
-    }
-
-    public Integer getDisabilitySeverity() {
-        return disabilitySeverity;
-    }
-
-    public DisabilitySeverity getDisabilityStatus() {
-        if (disabilitySeverity != null) {
-            return DisabilitySeverity.get(disabilitySeverity + 1);
-        }
-        return null;
     }
 
 
@@ -495,5 +393,33 @@ public class Patient extends GenericPatient {
     }
 
 
-
+    @Override
+    public String toString() {
+        return "Patient{" +
+                "district=" + getPrimaryClinic().getDistrict().getName() +
+                ", province=" + getPrimaryClinic().getDistrict().getProvince().getName() +
+                ", disabilityCategorys=" + disabilityCategorys +
+                ", patientHistories=" + patientHistories +
+                ", mobilePhone=" + mobilePhone +
+                ", supportGroupDistrict=" + supportGroupDistrict +
+                ", supportGroup"+getSupportGroup()+
+                ", age=" + age +
+                ", primaryClinic='" + getPrimaryClinic().getName() + '\'' +
+                ", name='" + name + '\'' +
+                ", enhancedStatus=" + enhancedStatus +
+                ", haveBirthCertificate=" + haveBirthCertificate +
+                ", IDNumber='" + IDNumber + '\'' +
+                ", maritalStatus=" + maritalStatus +
+                ", orphanStatus=" + orphanStatus +
+                ", onArvs=" + onArvs +
+                ", onCotrimoxazole=" + onCotrimoxazole +
+                ", dateStartedTreatment=" + dateStartedTreatment +
+                ", disclosureType=" + disclosureType +
+                ", artRegimen='" + artRegimen + '\'' +
+                ", isKeypopulation=" + isKeypopulation +
+                ", keyPopulation=" + keyPopulation +
+                ", disablityType='" + disablityType + '\'' +
+                ", clientType=" + clientType +
+                '}';
+    }
 }

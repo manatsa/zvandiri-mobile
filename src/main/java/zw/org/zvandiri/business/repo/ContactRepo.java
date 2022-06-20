@@ -22,10 +22,8 @@ import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import zw.org.zvandiri.business.domain.Assessment;
-import zw.org.zvandiri.business.domain.Contact;
-import zw.org.zvandiri.business.domain.Patient;
-import zw.org.zvandiri.business.domain.User;
+import org.springframework.web.bind.annotation.RequestParam;
+import zw.org.zvandiri.business.domain.*;
 
 /**
  *
@@ -36,20 +34,27 @@ public interface ContactRepo extends JpaRepository<Contact, String> {
     @Query("from Contact c left join fetch c.createdBy left join fetch c.modifiedBy left join fetch c.patient left join fetch c.location left join fetch c.position  left join fetch c.clinicalAssessments left join fetch c.nonClinicalAssessments where c.id=:id")
     public Contact findByIds(@Param("id") String id);
     
-    @Query("Select Distinct(c) from Contact c left join fetch c.clinicalAssessments left join fetch c.nonClinicalAssessments where c.patient=:patient")
+    @Query("Select Distinct(c) from Contact c left join fetch c.clinicalAssessments left join fetch c.nonClinicalAssessments left join fetch c.serviceOffereds left join fetch c.servicereferreds where c.patient=:patient")
     public List<Contact> findByPatient(@Param("patient") Patient patient);
     
-    @Query("Select Distinct(c) from Contact c left join fetch c.clinicalAssessments left join fetch c.nonClinicalAssessments where c.patient=:patient and (c.contactDate) between :start and :end")
-    public List<Contact> findByPatientAndContactDate(
+//    @Query("Select Distinct(c) from Contact c left join fetch c.clinicalAssessments left join fetch c.nonClinicalAssessments where c.patient=:patient and (c.contactDate) between :start and :end")
+    public List<Contact> findByPatientAndContactDateBetween(
             @Param("patient") Patient patient,
+            @Param("start") Date start, @Param("end") Date end);
+
+        @Query("Select Distinct(c) from Contact c left join fetch c.clinicalAssessments left join fetch c.nonClinicalAssessments where c.patient=:patient and (c.contactDate) between :start and :end")
+    public List<Contact> findByPatientAndContactDates(
+            @Param("patient") Patient patient,
+            @Param("start") Date start, @Param("end") Date end);
+
+    @Query("Select Distinct(c) from Contact c left join fetch c.clinicalAssessments left join fetch c.nonClinicalAssessments left join  fetch  c.patient p where p.primaryClinic=:facility and (c.contactDate) between :start and :end order by  p.lastName ASC, p.firstName ASC, c.dateCreated DESC")
+    public List<Contact> findByFacilityAndContactDates(
+            @Param("facility") Facility facility,
             @Param("start") Date start, @Param("end") Date end);
     
     @Query("Select Distinct(c) from Contact c left join fetch c.patient left join fetch c.location left join fetch c.position left join fetch c.clinicalAssessments left join fetch c.nonClinicalAssessments")
     public List<Contact> findByAllContacts();
-    
-    /*@Query("Select Distinct(c) from Contact c left join fetch c.createdBy left join fetch c.patient left join fetch c.location left join fetch c.position left join fetch c.period left join fetch c.internalReferral left join fetch c.externalReferral left join fetch c.clinicalAssessments left join fetch c.nonClinicalAssessments left join fetch c.actionTaken left join fetch c.stables left join fetch c.enhanceds left join fetch c.parent left join fetch c.referredPerson where  order by c.contactDate DESC")
-    public List<Contact> findByReferredPersonAndOpenOrderByContactDateDesc(@Param("referredPerson") User referredPerson, @Param("open") Boolean open);*/
-    
+
     public List<Contact> findTop1ByPatientOrderByContactDateDesc(Patient patient);
 
     @Query("select c from Contact c join c.clinicalAssessments d  where d = ?1")
@@ -60,5 +65,12 @@ public interface ContactRepo extends JpaRepository<Contact, String> {
             "where a.name='Unwell' " +
             "and c.contact_date between :startDate and :endDate", nativeQuery = true)
     List<Contact> findUnwellClients(@Param("startDate") Date startDate, @Param("endDate") Date endDate );
+
+    @Query("select distinct  c from Contact c where c.patient.primaryClinic.id=:facility and c.dateCreated between  :start and :end ")
+    List<Contact> findByFacilityInGivenTime(@RequestParam("start") Date start, @RequestParam("end") Date end, @RequestParam("facility") String facility);
+
+    @Query("select distinct  c from Contact c where c.patient.primaryClinic.district.id=:district and c.dateCreated between  :start and :end ")
+    List<Contact> findByDistrictInGivenTime(@RequestParam("start") Date start, @RequestParam("end") Date end, @RequestParam("district") String district);
+
 
 }

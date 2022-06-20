@@ -7,10 +7,13 @@ package zw.org.zvandiri.business.service;
 
 import zw.org.zvandiri.business.domain.ServiceOffered;
 
+import java.util.List;
+
 /**
  *
  * @author jmuzinda
  */
 public interface ServiceOfferedService  extends GenericNameService<ServiceOffered> {
+    List<ServiceOffered> getServicesOffered();
     
 }

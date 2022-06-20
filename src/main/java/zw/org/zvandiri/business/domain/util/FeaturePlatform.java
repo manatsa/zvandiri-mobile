@@ -25,7 +25,7 @@ public enum FeaturePlatform {
         if(code=="")return null;
         switch(code){
             case "1":
-                return ALL;
+                return BOTH;
             case "2":
                 return WEB;
             case "3":

@@ -117,6 +117,16 @@ public class TbIptServiceImpl implements TbIptService {
     }
 
     @Override
+    public List<TbIpt> findByDistrictInGivenTime(Date start, Date end, String district) {
+        return repo.findByDistrictInGivenTime(start, end, district);
+    }
+
+    @Override
+    public List<TbIpt> findByFacilityInGivenTime(Date start, Date end, String facility) {
+        return repo.findByFacilityInGivenTime(start, end, facility);
+    }
+
+    @Override
     public boolean existsOnTbTreatment(Patient patient, TbIdentificationOutcome yesNo) {
 
         return repo.existsByPatientAndTbIdentificationOutcome(patient, yesNo) >= 1;

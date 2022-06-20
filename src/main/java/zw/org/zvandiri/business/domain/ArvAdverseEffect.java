@@ -37,7 +37,7 @@ import zw.org.zvandiri.business.domain.util.Status;
 public class ArvAdverseEffect extends BaseEntity {
  
     @ManyToOne
-    @JoinColumn(name="arv_hist", updatable = false, insertable = false)
+    @JoinColumn(name="arv_hist")
     private ArvHist arvHist;
     private String event;
     @Temporal(TemporalType.DATE)

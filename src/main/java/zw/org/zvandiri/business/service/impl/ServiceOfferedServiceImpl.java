@@ -97,5 +97,9 @@ public class ServiceOfferedServiceImpl implements ServiceOfferedService {
         }
         return false;
     }
-    
+
+    @Override
+    public List<ServiceOffered> getServicesOffered() {
+        return null;
+    }
 }

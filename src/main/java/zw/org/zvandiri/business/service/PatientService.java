@@ -15,14 +15,12 @@
  */
 package zw.org.zvandiri.business.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.repository.query.Param;
-import zw.org.zvandiri.business.domain.CatDetail;
-import zw.org.zvandiri.business.domain.District;
-import zw.org.zvandiri.business.domain.Patient;
-import zw.org.zvandiri.business.domain.Province;
+import zw.org.zvandiri.business.domain.*;
 import zw.org.zvandiri.business.util.dto.MobilePatientDTO;
 import zw.org.zvandiri.business.util.dto.NameIdDTO;
 import zw.org.zvandiri.business.util.dto.PatientDuplicateDTO;
@@ -61,4 +59,8 @@ public interface PatientService extends GenericService<Patient> {
     List<Patient> getActiveByDistrict(District district);
 
     List<Patient> getActiveByProvince(Province province);
+
+    public List<Patient> findByDistrictInGivenTime(Date start, Date end, String district);
+
+    public List<Patient> findByFacilityInGivenTime(Date start, Date end, String facility);
 }

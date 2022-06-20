@@ -23,6 +23,7 @@ import java.util.Set;
 @ToString()
 public class TbTPTDTO {
 
+    private String id;
     @ManyToOne
     @JoinColumn(name = "patient")
     private String patient;
@@ -71,12 +72,17 @@ public class TbTPTDTO {
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date dateCompletedOnIpt;
+    @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    private Date dateCreated;
+    private String pname;
 
 
     public TbTPTDTO() {
     }
 
     public TbTPTDTO(TbIpt tbIpt) {
+        this.id=tbIpt.getId();
         this.screenedForTb = tbIpt.getScreenedForTb();
         this.dateScreened = tbIpt.getDateScreened();
         this.identifiedWithTb = tbIpt.getIdentifiedWithTb();
@@ -96,6 +102,16 @@ public class TbTPTDTO {
         this.startedOnIpt = tbIpt.getStartedOnIpt();
         this.dateStartedOnIpt = tbIpt.getDateStartedOnIpt();
         this.dateCompletedOnIpt = tbIpt.getDateCompletedOnIpt();
+        this.dateCreated=tbIpt.getDateCreated();
+        this.pname=tbIpt.getPatient().getName();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getPatient() {
@@ -145,22 +161,6 @@ public class TbTPTDTO {
     public void setDateStartedTreatment(Date dateStartedTreatment) {
         this.dateStartedTreatment = dateStartedTreatment;
     }
-
-   /* public String getReferralForSputum() {
-        return referralForSputum;
-    }
-
-    public void setReferralForSputum(String referralForSputum) {
-        this.referralForSputum = referralForSputum;
-    }
-
-    public TbTreatmentOutcome getTbTreatmentOutcome() {
-        return tbTreatmentOutcome;
-    }
-
-    public void setTbTreatmentOutcome(TbTreatmentOutcome tbTreatmentOutcome) {
-        this.tbTreatmentOutcome = tbTreatmentOutcome;
-    }*/
 
     public YesNo getReferredForIpt() {
         return referredForIpt;
@@ -274,6 +274,22 @@ public class TbTPTDTO {
         this.dateCompletedOnIpt = dateCompletedOnIpt;
     }
 
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public String getPname() {
+        return pname;
+    }
+
+    public void setPname(String pname) {
+        this.pname = pname;
+    }
+
     public String getSymptoms() {
         if (tbSymptoms.isEmpty()) {
             return "";
@@ -294,10 +310,31 @@ public class TbTPTDTO {
 
     @Override
     public String toString() {
-        return "TbIpt [patient=" + patient + ", screenedForTb=" + screenedForTb + ", dateScreened=" + dateScreened
-                + ", tbSymptoms=" + tbSymptoms + ", identifiedWithTb=" + identifiedWithTb + ", dateStartedTreatment=" +
-                dateStartedTreatment + ", referredForIpt="
-                + referredForIpt + ", onIpt=" + onIpt + ", dateStartedIpt=" + dateStartedIpt + "]";
+        return "TbTPTDTO{" +
+                "id='" + id + '\'' +
+                ", patient='" + patient + '\'' +
+                ", screenedForTb=" + screenedForTb +
+                ", dateScreened=" + dateScreened +
+                ", identifiedWithTb=" + identifiedWithTb +
+                ", tbSymptoms=" + tbSymptoms +
+                ", referredForInvestigation=" + referredForInvestigation +
+                ", eligibleForIpt=" + eligibleForIpt +
+                ", referredForIpt=" + referredForIpt +
+                ", referralComplete=" + referralComplete +
+                ", screenedByHcw=" + screenedByHcw +
+                ", identifiedWithTbByHcw=" + identifiedWithTbByHcw +
+                ", onTBTreatment=" + onTBTreatment +
+                ", dateStartedTreatment=" + dateStartedTreatment +
+                ", dateCompletedTreatment=" + dateCompletedTreatment +
+                ", onIpt=" + onIpt +
+                ", dateStartedIpt=" + dateStartedIpt +
+                ", dateCompletedIpt=" + dateCompletedIpt +
+                ", startedOnIpt=" + startedOnIpt +
+                ", dateStartedOnIpt=" + dateStartedOnIpt +
+                ", dateCompletedOnIpt=" + dateCompletedOnIpt +
+                ", dateCreated=" + dateCreated +
+                ", pname='" + pname + '\'' +
+                '}';
     }
 
 }

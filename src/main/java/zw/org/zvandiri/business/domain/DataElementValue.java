@@ -29,13 +29,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class DataElementValue extends BaseEntity {
     
     @ManyToOne
-    @JoinColumn(name="facility", updatable = false, insertable = false)
+    @JoinColumn(name="facility")
     private Facility facility;
     @ManyToOne
-    @JoinColumn(name="period", updatable = false, insertable = false)
+    @JoinColumn(name="period")
     private Period period;
     @ManyToOne
-    @JoinColumn(name="data_element", updatable = false, insertable = false)
+    @JoinColumn(name="data_element")
     private DataElement dataElement;
     private Integer itemValue;
 

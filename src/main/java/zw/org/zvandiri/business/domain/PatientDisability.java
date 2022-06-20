@@ -30,10 +30,10 @@ public class PatientDisability extends BaseEntity {
     
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name="patient", updatable = false, insertable = false)
+    @JoinColumn(name="patient")
     private Patient patient;
     @ManyToOne
-    @JoinColumn(name="disability_category", updatable = false, insertable = false)
+    @JoinColumn(name="disability_category")
     private DisabilityCategory disabilityCategory;
     @Enumerated
     private DisabilitySeverity severity;

@@ -36,20 +36,20 @@ public class MedicalHist extends BaseEntity {
 
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name="patient", updatable = false, insertable = false)
+    @JoinColumn(name="patient")
     private Patient patient;
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date hospWhen;
     @ManyToOne
-    @JoinColumn(name="primary_clinic", updatable = false, insertable = false)
+    @JoinColumn(name="primary_clinic")
     private Facility primaryClinic;
     @Transient
     private Province province;
     @Transient
     private District district;
     @ManyToOne
-    @JoinColumn(name="hosp_cause", updatable = false, insertable = false)
+    @JoinColumn(name="hosp_cause")
     private HospCause hospCause;
     @Enumerated
     private YesNo outcome;

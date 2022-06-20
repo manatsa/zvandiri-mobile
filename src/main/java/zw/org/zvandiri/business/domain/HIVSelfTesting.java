@@ -35,7 +35,7 @@ public class HIVSelfTesting extends BaseEntity{
     @Enumerated
     private YesNo artInitiation;
     @ManyToOne
-    @JoinColumn(name="person", updatable = false, insertable = false)
+    @JoinColumn(name="person")
     private Person person;
 
     public HIVSelfTesting(Person person) {
