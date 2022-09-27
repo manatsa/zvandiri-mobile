@@ -16,31 +16,39 @@
 package zw.org.zvandiri.business.domain;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.ManyToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import lombok.ToString;
 import zw.org.zvandiri.business.domain.util.ContactAssessment;
 
 /**
  *
  * @author Judge Muzinda
  */
+@ToString
 @Entity @JsonIgnoreProperties(ignoreUnknown = true)
 public class Assessment extends BaseName {
 
-    @ManyToMany(mappedBy = "clinicalAssessments", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @ToString.Exclude
+    @ManyToMany(mappedBy = "clinicalAssessments", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     @JsonIgnore
-    private Set<Contact> clinicalAssessments = new HashSet<>();
+    private Set<Contact> clinicalAssessments = new java.util.LinkedHashSet<>();
 
-    @ManyToMany(mappedBy = "nonClinicalAssessments", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @ToString.Exclude
+    @ManyToMany(mappedBy = "nonClinicalAssessments", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     @JsonIgnore
-    private Set<Contact> nonClinicalAssessments = new HashSet<>();
+    private Set<Contact> nonClinicalAssessments = new java.util.LinkedHashSet<>();
+    @ToString.Include
+    @Enumerated
     private ContactAssessment contactAssessment;
 
     public Set<Contact> getClinicalAssessments() {
@@ -67,4 +75,25 @@ public class Assessment extends BaseName {
         this.contactAssessment = contactAssessment;
     }
 
+    @Override
+    public String toString() {
+        return "Assessment{" +
+                "ID"+getId()+
+                "name=" + getName() +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Assessment that = (Assessment) o;
+        return Objects.equals(getName(), that.getName()) && Objects.equals(getId(), that.getId()) ;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), getName(), getId());
+    }
 }

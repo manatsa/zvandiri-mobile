@@ -4,12 +4,14 @@ package zw.org.zvandiri.business.domain.dto;
 import zw.org.zvandiri.business.domain.District;
 import zw.org.zvandiri.business.domain.ServicesReferred;
 
+import java.io.Serializable;
+
 /**
  * @author manatsachinyeruse@gmail.com
  */
 
 
-public class ServiceReferredDTO {
+public class ServiceReferredDTO implements Serializable {
     private String id;
     private String name;
 

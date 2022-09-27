@@ -4,13 +4,14 @@ import zw.org.zvandiri.business.domain.BugReport;
 import zw.org.zvandiri.business.domain.util.BugStatus;
 import zw.org.zvandiri.business.util.dto.UserDTO;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * @author manatsachinyeruse@gmail.com
  */
 
-public class BugReportDTO  {
+public class BugReportDTO  implements Serializable {
     private String id;
     private String bug;
     private String details;

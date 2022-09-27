@@ -58,4 +58,7 @@ public interface InvestigationTestRepo extends JpaRepository<InvestigationTest, 
     public List<InvestigationTest> findByFacilityAndDateTakenBetween(
             @Param("facility") Facility facility,
             @Param("start") Date start, @Param("end") Date end);
+
+        @Query("select distinct i from  InvestigationTest  i left join fetch i.patient where i.patient=:patient ")
+        public List<InvestigationTest> getItemsByPatient(@Param("patient") Patient patient);
 }

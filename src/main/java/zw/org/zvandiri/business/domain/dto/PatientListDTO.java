@@ -8,6 +8,7 @@ import zw.org.zvandiri.business.domain.util.Gender;
 import javax.persistence.Enumerated;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -15,7 +16,7 @@ import java.util.Date;
  */
 
 
-public class PatientListDTO {
+public class PatientListDTO implements Serializable {
     private String id;
     private Integer enhancedStatus;
     private String firstName;

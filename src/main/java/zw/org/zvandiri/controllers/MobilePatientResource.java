@@ -2,13 +2,16 @@ package zw.org.zvandiri.controllers;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import zw.org.zvandiri.business.domain.*;
 import zw.org.zvandiri.business.domain.Referral;
+import zw.org.zvandiri.business.domain.*;
 import zw.org.zvandiri.business.domain.dto.*;
 import zw.org.zvandiri.business.domain.util.*;
 import zw.org.zvandiri.business.repo.*;
@@ -16,15 +19,19 @@ import zw.org.zvandiri.business.service.*;
 import zw.org.zvandiri.business.util.dto.MobileStaticsDTO;
 
 import javax.annotation.Resource;
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
 @RestController
 @RequestMapping("/patient/")
-public class MobilePatientResource {
+public class MobilePatientResource implements Serializable {
 
     @Resource
     private CatDetailService catDetailService;
@@ -92,7 +99,8 @@ public class MobilePatientResource {
 
     DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
-
+    public MobilePatientResource() {
+    }
 
     @GetMapping("/initial-statics")
     public MobileStaticsDTO getCatPatients(@RequestParam("email") String email) {
@@ -192,9 +200,10 @@ public class MobilePatientResource {
 
         List<Assessment> assessments = assessmentService.getAll();
         List<AssessmentDTO> assessmentDTOS= new ArrayList<>();
-        for(Assessment assessment: assessments){
+        assessments.stream().forEach(assessment -> {
             assessmentDTOS.add(new AssessmentDTO(assessment));
-        }
+        });
+
 
         List<Location> locations=locationService.getAll();
         List<LocationDTO> locationDTOS=new ArrayList<>();
@@ -237,11 +246,6 @@ public class MobilePatientResource {
             reasonForNotReachingOLvelDTOS.add(new ReasonForNotReachingOLvelDTO(reasonForNotReachingOLevel));
         }
 
-
-
-
-
-
         mobileStaticsDTO.setPatients(patientListDTOS);
         mobileStaticsDTO.setDistricts(districtDTOS);
         mobileStaticsDTO.setProvinces(provinceDTOS);
@@ -268,8 +272,8 @@ public class MobilePatientResource {
         long end = System.currentTimeMillis();
         long time=(end-start)/(60000);
         String timeTaken=time<120 ? time+" mins": ((double)Math.round(time/60))+" hrs";
-        System.err.println("\n<= User::" + email + " => Statics,********, User : "+userService.getCurrentUsername()+" <> "+
-                patients.size()+" patients retrieved ******** Time Taken:: "+timeTaken+"\n\n");
+        System.err.println("\n<= INITIAL SYNC => User::" + email + " ******** District::"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" <> "+
+                patients.size()+" patients retrieved, v2 ******** Time Taken:: "+timeTaken+"\n");
 
 
         return mobileStaticsDTO;
@@ -302,29 +306,26 @@ public class MobilePatientResource {
         long time=(end-start)/(60000);
         String timeTaken=time<120 ? time+" mins": ((double)Math.round(time/60))+" hrs";
         System.err.println("\n<= User::" + currentUser.getUserName() + " => Refresh Patients,********, User : "+userService.getCurrentUsername()+" <> "+
-                patients.size()+" patients retrieved ******** Time Taken:: "+timeTaken+"\n\n");
+                patients.size()+" patients retrieved, v2 ******** Time Taken:: "+timeTaken+"\n");
 
 
         return patientListDTOS;
     }
 
     @GetMapping("/get-patient-stats")
-    public ResponseEntity<?> getPatientStats(@RequestParam(value = "start") @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,@RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") Date end, @RequestParam(value = "patient", required = false) String patient,@RequestParam(value = "facility", required = false) String primaryClinic, @RequestParam(value = "district", required = false) String district) {
+    public ResponseEntity<?> getPatientStats(@RequestParam(value = "start") @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,@RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") Date end, @RequestParam(value = "patient", required = false) String patient, @RequestParam(value = "facility", required = false) String primaryClinic) {
         User currentUser=userService.getCurrentUser();
         long starttime=System.currentTimeMillis();
         LineItemsDTO lineItemsDTO=new LineItemsDTO();
 
-                if(district!=null && (primaryClinic==null || primaryClinic.isEmpty()) && (patient==null || patient.isEmpty())){
-                    return new ResponseEntity<>("District level line items not yet implemented on zvamoda!", HttpStatus.SERVICE_UNAVAILABLE);
-                }
-                else if(primaryClinic!=null && !primaryClinic.isEmpty()){
-                    Facility facility=facilityService.get(primaryClinic);
-                    List<Patient> patients=patientRepo.findByFacilityInGivenTime(start, end, facility.getId());
-                    List<Contact> contacts=contactRepo.findByFacilityAndContactDates(facility, start, end);
-                    List<MentalHealthScreening> mentalHealthScreenings=mentalHealthScreeningRepo.findByFacilityAndDateScreenedBetween(facility, start, end);
-                    List<InvestigationTest> investigationTests=investigationTestRepo.findByFacilityAndDateTakenBetween(facility, start, end);
-                    List<TbIpt> tbIpts = tbIptRepo.findByFacilityAndDateScreenedBetween(facility, start, end);
-                    List<Referral> referrals=referralRepo.findByFacilityAndReferralDateBetween(facility, start,end);
+                if(primaryClinic!=null && !primaryClinic.isEmpty() && primaryClinic.equals("ALL")){
+                    District district=currentUser.getDistrict();
+                    List<Patient> patients=patientRepo.findByDistrictInGivenTime(start, end, district.getId());
+                    List<Contact> contacts=contactRepo.findByDistrictAndContactDates(district, start, end);
+                    List<MentalHealthScreening> mentalHealthScreenings=mentalHealthScreeningRepo.findByDistrictInGivenTime(start, end, district.getId());
+                    List<InvestigationTest> investigationTests=investigationTestRepo.findByDistrictInGivenTime(start, end, district.getId());
+                    List<TbIpt> tbIpts = tbIptRepo.findByDistrictInGivenTime(start, end, district.getId());
+                    List<Referral> referrals=referralRepo.findByDistrictInGivenTime(start,end, district.getId());
 
                     List<PatientDTO> patientDTOList=patients.stream().map(patientz -> new PatientDTO(patientz)).collect(Collectors.toList());
                     List<ContactDTO> contactDTOList=contacts.stream().map(contact -> new ContactDTO(contact)).collect(Collectors.toList());
@@ -339,6 +340,43 @@ public class MobilePatientResource {
                     lineItemsDTO.setReferrals(referralDTOList);
                     lineItemsDTO.setTbIpts(tbTPTDTOList);
                     lineItemsDTO.setMentalHealthScreenings(mentalHealthScreeningDTOList);
+
+                    long endtime = System.currentTimeMillis();
+                    long time=(endtime-starttime)/(60000);
+                    String timeTaken=time<120 ? time+" mins": ((double)Math.round(time/60))+" hrs";
+                    System.err.println("\n<<<<<<<<<<<< = User::" + currentUser.getUserName() + " **** "+"DISTRICT::"+district.getName()+"  <>  patients Line Items retrieved ******** Time Taken:: "+timeTaken+"\n");
+
+                }
+                else if(primaryClinic!=null && !primaryClinic.isEmpty()){
+                    Facility facility=facilityService.get(primaryClinic);
+
+                        List<Patient> patients = patientRepo.findByFacilityInGivenTime(start, end, facility.getId());
+                        List<Contact> contacts = contactRepo.findByFacilityAndContactDates(facility, start, end);
+                        List<MentalHealthScreening> mentalHealthScreenings = mentalHealthScreeningRepo.findByFacilityAndDateScreenedBetween(facility, start, end);
+                        List<InvestigationTest> investigationTests = investigationTestRepo.findByFacilityAndDateTakenBetween(facility, start, end);
+                        List<TbIpt> tbIpts = tbIptRepo.findByFacilityAndDateScreenedBetween(facility, start, end);
+                        List<Referral> referrals = referralRepo.findByFacilityAndReferralDateBetween(facility, start, end);
+
+                        List<PatientDTO> patientDTOList = patients.stream().map(patientz -> new PatientDTO(patientz)).collect(Collectors.toList());
+                        List<ContactDTO> contactDTOList = contacts.stream().map(contact -> new ContactDTO(contact)).collect(Collectors.toList());
+                        List<MentalHealthScreeningDTO> mentalHealthScreeningDTOList = mentalHealthScreenings.stream().map(mentalHealthScreening -> new MentalHealthScreeningDTO(mentalHealthScreening)).collect(Collectors.toList());
+                        List<TbTPTDTO> tbTPTDTOList = tbIpts.stream().map(tbIpt -> new TbTPTDTO(tbIpt)).collect(Collectors.toList());
+                        List<VLCD4DTO> vlcd4DTOList = investigationTests.stream().map(investigationTest -> new VLCD4DTO(investigationTest)).collect(Collectors.toList());
+                        List<ReferralDTO> referralDTOList = referrals.stream().map(referral -> new ReferralDTO(referral)).collect(Collectors.toList());
+
+                        lineItemsDTO.setPatients(patientDTOList);
+                        lineItemsDTO.setContacts(contactDTOList);
+                        lineItemsDTO.setInvestigationTests(vlcd4DTOList);
+                        lineItemsDTO.setReferrals(referralDTOList);
+                        lineItemsDTO.setTbIpts(tbTPTDTOList);
+                        lineItemsDTO.setMentalHealthScreenings(mentalHealthScreeningDTOList);
+
+                    long endtime = System.currentTimeMillis();
+                    long time=(endtime-starttime)/(60000);
+                    String timeTaken=time<120 ? time+" mins": ((double)Math.round(time/60))+" hrs";
+                    System.err.println("\n<<<<<<<<<<<< = User::" + currentUser.getUserName() + " **** "+"FACILITY::"+facilityService.get(primaryClinic)+"  <>  patients Line Items retrieved, v2 ******** Time Taken:: "+timeTaken+"\n");
+
+
 
                 }
                 else if(patient!=null && !patient.isEmpty()){
@@ -361,185 +399,40 @@ public class MobilePatientResource {
                     lineItemsDTO.setTbIpts(tbTPTDTOList);
                     lineItemsDTO.setMentalHealthScreenings(mentalHealthScreeningDTOList);
 
+                    long endtime = System.currentTimeMillis();
+                    long time=(endtime-starttime)/(60000);
+                    String timeTaken=time<120 ? time+" mins": ((double)Math.round(time/60))+" hrs";
+                    System.err.println("\n<<<<<<<<<<<< = User::" + currentUser.getUserName() + " **** "+" <=> PATIENT::"+patientService.get(patient).getName()+"  <>  patients Line Items retrieved, v2 ******** Time Taken:: "+timeTaken+"\n");
+
+
                 }
                 else{
                     return new ResponseEntity<>("Your request is malformed.", HttpStatus.BAD_REQUEST);
                 }
 
 
-        long endtime = System.currentTimeMillis();
-        long time=(endtime-starttime)/(60000);
-        String timeTaken=time<120 ? time+" mins": ((double)Math.round(time/60))+" hrs";
-        System.err.println("\n<<<<<<<<<<<< = User::" + currentUser.getUserName() + " **** "+(primaryClinic!=null && !primaryClinic.isEmpty()?"FACILITY::"+primaryClinic:"PATIENT::"+patient)+"  <>  patients Line Items retrieved ******** Time Taken:: "+timeTaken+"\n\n");
 
 
         return new ResponseEntity<>(lineItemsDTO, HttpStatus.OK);
     }
-
 
     @GetMapping("/get-cats")
     public CatDetail getCats(@RequestParam("email") String email) {
         return catDetailService.getByEmail(email);
     }
 
-    @PostMapping(value = "/add-contacts")
-    @Transactional
-    public ResponseEntity<?> addContact(@RequestBody List<ContactDTO> contactDTOS) {
-        Response response=new Response(200,"Saved successfully","");
-        User currentUser=userService.getCurrentUser();
-
-        try {
-            List<BaseEntity> savedContas=new ArrayList<>();
-
-
-            for(ContactDTO contactDTO: contactDTOS){
-                Patient patient=patientService.get(contactDTO.getPatient());
-                Set<Contact> contacts=patient.getContacts();
-                Position position=positionService.get(contactDTO.getPosition());
-                Location location=locationService.get(contactDTO.getLocation());
-                Contact contact=new Contact(contactDTO);
-                contact.setCreatedBy(currentUser);
-                contact.setDateCreated(new Date());
-                contact.setPatient(patient);
-                contact.setLocation(location);
-                contact.setPosition(position);
-                contact.setRecordSource(RecordSource.MOBILE_APP);
-                //convert ID to specific Objects
-                contact.setNonClinicalAssessments(contactDTO.getNonClinicalAssessments().stream().map(s ->assessmentService.get(s)).collect(Collectors.toSet()));
-                contact.setClinicalAssessments(contactDTO.getClinicalAssessments().stream().map(s -> assessmentService.get(s)).collect(Collectors.toSet()));
-                contact.setServiceOffereds(contactDTO.getServiceOffereds().stream().map(s -> serviceOfferedService.get(s)).collect(Collectors.toSet()));
-                contact.setServicereferreds(contactDTO.getServicereferreds().stream().map(s -> servicesReferredService.get(s)).collect(Collectors.toSet()));
-
-                //checking if contact is not already saved
-                if(contacts.stream().filter(contact1 -> contact1.getContactDate().toString().equals(formatter.format(contact.getContactDate()))).count()<=0){
-                    Contact contact1= contactService.save(contact);
-                    System.err.println("\n******************** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" saved contacts :"+contactDTOS.size()+"\n\n");
-
-                }else{
-                    System.err.println("\n******************** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" duplicate contact not saved >>>>>> Contact Date::"+contact.getContactDate()+"\n\n");
-                }
-
-            }
-
-        } catch (Exception e) {
-            System.err.println("\n\n******************** ERROR: user :"+currentUser.getUserName()+" <=> District:"+currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName()+" >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
-            e.printStackTrace();
-            response.setCode(500);
-            response.setMessage(e.getMessage());
-            response.setDescription(e.getLocalizedMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    @PostMapping(value = "/add-vlcd4s")
-    @Transactional
-    public ResponseEntity<?> addVLCD4(@RequestBody List<VLCD4DTO> vlcd4DTOS) {
-
-        Response response=new Response(200,"Saved successfully","");
-        User currentUser=userService.getCurrentUser();
-        try {
-            for(VLCD4DTO vlcd4DTO: vlcd4DTOS){
-                Patient patient=patientService.get(vlcd4DTO.getPatient());
-                Set<InvestigationTest> tests=patient.getInvestigationTests();
-                InvestigationTest test=new InvestigationTest(vlcd4DTO);
-                test.setCreatedBy(currentUser);
-                test.setDateCreated(new Date());
-                test.setPatient(patient);
-                test.setActive(true);
-                test.setRecordSource(RecordSource.MOBILE_APP);
-                if(tests.stream().filter(test1 -> test1.getDateTaken().toString().equals(formatter.format(test.getDateTaken()))).count()<=0){
-                    InvestigationTest investigationTest=investigationTestService.save(test);
-                    System.err.println("\n******************** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> saved VL/CD4 items :"+vlcd4DTOS.size()+"\n\n");
-                }else{
-                    System.err.println("\n******************** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" duplicate VL not saved >>>>>> Date Taken::"+test.getDateTaken()+" \n\n");
-                }
-
-
-            }
-            } catch (Exception e) {
-            System.err.println("\n\n********************ERROR: user :"+currentUser.getUserName()+" <=> District:"+currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName()+" >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
-            e.printStackTrace();
-            response.setCode(500);
-            response.setMessage(e.getMessage());
-            response.setDescription(e.getLocalizedMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    @PostMapping(value = "/add-referrals")
-    @Transactional
-    public ResponseEntity<?> addReferrals(@RequestBody List<ReferralDTO> referralDTOS) {
-        Response response=new Response(200,"Saved successfully","");
-        User currentUser=userService.getCurrentUser();
-
-        try {
-
-            for(ReferralDTO referralDTO: referralDTOS){
-                Patient patient=patientService.get(referralDTO.getPatient());
-                Set<Referral> referrals=patient.getReferrals();
-                Referral referral=new Referral(referralDTO);
-                referral.setPatient(patient);
-                referral.setCreatedBy(currentUser);
-                referral.setDateCreated(new Date());
-                referral.setPatient(patient);
-                referral.setRecordSource(RecordSource.MOBILE_APP);
-
-                referral.setHivStiServicesAvailed(referralDTO.getHivStiServicesAvailed().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
-                referral.setHivStiServicesReq(referralDTO.getHivStiServicesReq().stream().map(serviceReferredDTO ->servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
-                referral.setSrhReq(referralDTO.getSrhReq().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
-                referral.setSrhAvailed(referralDTO.getSrhAvailed().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
-                referral.setPsychAvailed(referralDTO.getPsychAvailed().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
-                referral.setPsychReq(referralDTO.getPsychReq().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
-                referral.setLaboratoryReq(referralDTO.getLaboratoryReq().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
-                referral.setLaboratoryAvailed(referralDTO.getLaboratoryAvailed().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
-                referral.setTbAvailed(referralDTO.getTbAvailed().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
-                referral.setTbReq(referralDTO.getTbReq().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
-                referral.setOiArtReq(referralDTO.getOiArtReq().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
-                referral.setOiArtAvailed(referralDTO.getOiArtAvailed().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
-                referral.setLegalAvailed(referralDTO.getLegalAvailed().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
-                referral.setLegalReq(referralDTO.getLegalReq().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
-
-                if(referrals.stream().filter(referral1 -> referral1.getReferralDate().toString().equals(formatter.format(referral.getReferralDate()))).count()<=0){
-                    Referral newRef=referralService.save(referral);
-                    System.err.println("\n****** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" >>>>>>>>>>>>>> saved referrals :"+referralDTOS.size()+"\n\n");
-                }else{
-                    System.err.println("\n***** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" duplicate Referral not saved >>>>>> REf Date;"+referral.getReferralDate()+" \n\n");
-                }
-
-
-
-
-            }
-
-        } catch (Exception e) {
-            System.err.println("\n\n********************ERROR: user :"+currentUser.getUserName()+" <=> District:"+currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName()+" >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
-            e.printStackTrace();
-            response.setCode(500);
-            response.setMessage(e.getMessage());
-            response.setDescription(e.getLocalizedMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
     @PostMapping("/add-patients")
+    @Transactional(readOnly = true,propagation = Propagation.SUPPORTS)
     public ResponseEntity<?> addPatient(@RequestBody List<PatientDTO> patientDTOS) {
 
         Response response = new Response(200, "Saved successfully", "");
         User currentUser=userService.getCurrentUser();
-        List<PatientDTO> patientDTOList=new ArrayList<>();
         try {
-
-            for (PatientDTO patientDTO : patientDTOS) {
+            patientDTOS.stream().forEach(patientDTO -> {
                 Patient patient = new Patient(patientDTO);
                 patient.setCreatedBy(currentUser);
                 patient.setDateCreated(new Date());
-                patient.setActive(true);
+                patient.setActive(Boolean.TRUE);
                 patient.setStatus(PatientChangeEvent.ACTIVE);
                 patient.setRecordSource(RecordSource.MOBILE_APP);
 
@@ -574,19 +467,29 @@ public class MobilePatientResource {
                 String referer=patientDTO.getReferer();
                 Referer referer1=refererService.get(referer);
                 patient.setReferer(referer1);
-                if(patient.getPrimaryClinic()!=null ) {
-                    System.err.println("Patient :"+patient);
-                    Patient patient1 = patientService.save(patient);
-                    patientDTO.setId(patient1.getId());
-                    patientDTOList.add(patientDTO);
-                }else{
-                    System.err.println("Failed to save patient-no primary clinic :"+patient.getName()+" +user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName()));
-                }
+                List<Patient> duplicates=patientService.checkPatientDuplicate(patient);
+                if(patient.getPrimaryClinic()!=null
+                        && (duplicates==null || duplicates.isEmpty())
+                ) {
+                    try{
+                        Patient patient1 = patientService.save(patient);
+                        patientDTO.setId(patient1.getId());
+                        //patientDTOList.add(patientDTO);
+                        System.err.println("\n********** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" >>>>>>>>>>>>> saved new Client \n\n");
+                    }catch (DataIntegrityViolationException e){
+                        System.err.println("Duplicate patient :"+patient.getName()+" +user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName()));
+                    }catch (DataAccessException e){
+                        System.err.println("Duplicate patient :"+patient.getName()+" +user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName()));
+                    }
 
-            }
-            System.err.println("\n******************** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> saved, via mobile, new Clients items :" + patientDTOS.size() + "\n\n");
+                }else{
+                    System.err.println("Failed to save patient-no primary clinic/is-duplicate :"+patient.getName()+" +user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName()));
+                }
+            });
+
+            System.err.println("\n******** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" >>>>>>>>>> saved, via mobile, new Clients items, v2, :" + patientDTOS.size() + "\n\n");
         } catch (Exception e) {
-            System.err.println("\n\n******************** ERROR=> user :"+currentUser.getUserName()+" <=> District:"+currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName()+" >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+            System.err.println("\n\n******************** ERROR=> user :"+currentUser.getUserName()+" <=> District:"+currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName()+" >>>>>>>>>>\n");
             e.printStackTrace();
             response.setCode(500);
             response.setMessage(e.getMessage());
@@ -595,37 +498,47 @@ public class MobilePatientResource {
         }
 
 //        response.setBaseEntities(patientDTOList);
-        return new ResponseEntity<>(patientDTOList, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/add-mental-health-screening-items")
-    @Transactional
-    public ResponseEntity<?> addMHScreenings(@RequestBody List<MentalHealthScreeningDTO> mentalHealthScreeningDTOS) {
-
-        Response response=new Response(200,"Saved successfully","");
+    @PostMapping(value = "/add-contacts")
+    @Transactional(readOnly = true,propagation = Propagation.SUPPORTS)
+    public ResponseEntity<?> addContact(@RequestBody List<ContactDTO> contactDTOS) {
+        Response response = new Response(200, "Saved successfully", "");
+        //List<DuplicateIndicator> dContacts=new ArrayList<>();
         User currentUser=userService.getCurrentUser();
+
         try {
-            for(MentalHealthScreeningDTO mentalHealthScreeningDTO: mentalHealthScreeningDTOS){
-                Patient patient=patientService.get(mentalHealthScreeningDTO.getPatient());
-                Set<MentalHealthScreening> screenings=patient.getMentalHealthScreenings();
-                MentalHealthScreening mentalHealthScreening=new MentalHealthScreening(mentalHealthScreeningDTO);
-                mentalHealthScreening.setCreatedBy(currentUser);
-                mentalHealthScreening.setDateCreated(new Date());
-                mentalHealthScreening.setPatient(patient);
-                mentalHealthScreening.setActive(true);
-                mentalHealthScreening.setRecordSource(RecordSource.MOBILE_APP);
-                if(screenings.stream().filter(mentalHealthScreening1 ->
-                        mentalHealthScreening1.getDateScreened().toString().equals(formatter.format(mentalHealthScreening.getDateScreened()))).count()<=0){
-                    MentalHealthScreening mentalHealthScreening1=mentalHealthScreeningService.save(mentalHealthScreening);
-                    System.err.println("\n******************** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> saved via mobile MH Screening items :"+mentalHealthScreeningDTOS.size()+"\n\n");
-                }else{
-                    System.err.println("\n******************** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" duplicate MH Screening not saved >>>>>> Date Screened::"+mentalHealthScreening.getDateScreened()+"\n\n");
-                }
 
+            contactDTOS.stream().forEach(contactDTO -> {
+                Patient patient=patientService.get(contactDTO.getPatient());
+                //Set<Contact> contacts=contactService.getByPatient(patient).stream().collect(Collectors.toSet());
+                Position position=positionService.get(contactDTO.getPosition());
+                Location location=locationService.get(contactDTO.getLocation());
+                Contact contact=new Contact(contactDTO);
+                contact.setCreatedBy(currentUser);
+                contact.setDateCreated(new Date());
+                contact.setPatient(patient);
+                contact.setLocation(location);
+                contact.setPosition(position);
+                contact.setRecordSource(RecordSource.MOBILE_APP);
+                //convert ID to specific Objects
+                contact.setNonClinicalAssessments(contactDTO.getNonClinicalAssessments().stream().map(s ->assessmentService.get(s)).distinct().collect(Collectors.toSet()));
+                contact.setClinicalAssessments(contactDTO.getClinicalAssessments().stream().map(s -> assessmentService.get(s)).distinct().collect(Collectors.toSet()));
+                contact.setServiceOffereds(contactDTO.getServiceOffereds().stream().map(s -> serviceOfferedService.get(s)).distinct().collect(Collectors.toSet()));
+                contact.setServicereferreds(contactDTO.getServicereferreds().stream().map(s -> servicesReferredService.get(s)).distinct().collect(Collectors.toSet()));
 
-            }
-            } catch (Exception e) {
-            System.err.println("\n\n******************** ERROR=> user :"+currentUser.getUserName()+" <=> District:"+currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName()+" >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+                    //System.err.println("Contact to Save::"+contact);
+                    Contact contact1=contactService.save(contact);
+
+                System.err.println("\n****** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" saved contact, via mobile\n");
+
+            });
+
+            System.err.println("\n*********** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" saved contacts, via mobile, v2 :"+contactDTOS.size()+"\n");
+
+        } catch (Exception e) {
+            System.err.println("\n******************** ERROR: user :"+currentUser.getUserName()+" <=> District:"+currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName()+" >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Error::"+e.getMessage()+"\n");
             e.printStackTrace();
             response.setCode(500);
             response.setMessage(e.getMessage());
@@ -636,35 +549,248 @@ public class MobilePatientResource {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/add-tb-tpt-screening-items")
-    @Transactional
-    public ResponseEntity<?> addTBScreenings(@RequestBody List<TbTPTDTO> tbTPTDTOS) {
-
-        Response response=new Response(200,"Saved successfully","");
+    @PostMapping(value = "/add-vlcd4s")
+    @Transactional(readOnly = true,propagation = Propagation.SUPPORTS)
+    public ResponseEntity<?> addVLCD4(@RequestBody List<VLCD4DTO> vlcd4DTOS) {
+        Response response = new Response(200, "Saved successfully", "");
+        //List<DuplicateIndicator> dVLs=new ArrayList<>();
         User currentUser=userService.getCurrentUser();
         try {
-            for(TbTPTDTO tbTPTDTO: tbTPTDTOS){
+
+            vlcd4DTOS.stream().forEach(vlcd4DTO -> {
+                Patient patient=patientService.get(vlcd4DTO.getPatient());
+                Set<InvestigationTest> tests=investigationTestRepo.getItemsByPatient(patient).stream().collect(Collectors.toSet());
+                InvestigationTest test=new InvestigationTest(vlcd4DTO);
+                test.setCreatedBy(currentUser);
+                test.setDateCreated(new Date());
+                test.setPatient(patient);
+                test.setActive(true);
+                test.setRecordSource(RecordSource.MOBILE_APP);
+                if(tests.stream().filter(test1 ->test1.getPatient().getId().equals(test.getPatient().getId()) &&
+                        test1.getDateTaken().toString().equals(formatter.format(test.getDateTaken()))
+                        && test1.getDateTaken().toString().equals(formatter.format(test.getDateTaken()))
+                        && test1.getDateCreated().toString().equals(formatter.format(test.getDateCreated()))
+                        && test1.getTestType().equals(test.getTestType())).count()<=0){
+                    try {
+                        InvestigationTest investigationTest=investigationTestService.save(test);
+                        System.err.println("\n******************** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" >>>>>>>>>>>>> saved VL/CD4 item, via mobile \n");
+                    }catch (DataIntegrityViolationException e){
+                        System.err.println("\n******************** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" duplicate VL not saved >>>>>> Date Taken::"+test.getDateTaken()+" \n");
+                    }catch (DataAccessException e){
+                        System.err.println("\n******************** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" duplicate VL not saved >>>>>> Date Taken::"+test.getDateTaken()+" \n");
+                    }
+
+                }else{
+                    System.err.println("\n******************** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" duplicate VL not saved >>>>>> Date Taken::"+test.getDateTaken()+" \n");
+                }
+            });
+
+            System.err.println("\n******************** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" >>>>>>>>>>>>> saved VL/CD4 items, via mobile, v2 :"+vlcd4DTOS.size()+"\n");
+            } catch (Exception e) {
+            System.err.println("\n\n********************ERROR: user :"+currentUser.getUserName()+" <=> District:"+currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName()+" >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Error::"+e.getMessage()+"\n");
+            response.setCode(500);
+            response.setMessage(e.getMessage());
+            response.setDescription(e.getLocalizedMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/add-referrals")
+    @Transactional(readOnly = true,propagation = Propagation.SUPPORTS)
+    public ResponseEntity<?> addReferrals(@RequestBody List<ReferralDTO> referralDTOS) {
+        //List<DuplicateIndicator> dReferrals=new ArrayList<>();
+        User currentUser=userService.getCurrentUser();
+        Response response = new Response(200, "Saved successfully", "");
+
+        try {
+            referralDTOS.stream().forEach(referralDTO -> {
+                Patient patient=patientService.get(referralDTO.getPatient());
+                Set<Referral> referrals=referralService.getByPatient(patient).stream().collect(Collectors.toSet());
+                Referral referral=new Referral(referralDTO);
+                referral.setPatient(patient);
+                referral.setCreatedBy(currentUser);
+                referral.setDateCreated(new Date());
+                referral.setPatient(patient);
+                referral.setRecordSource(RecordSource.MOBILE_APP);
+
+                referral.setHivStiServicesAvailed(referralDTO.getHivStiServicesAvailed().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
+                referral.setHivStiServicesReq(referralDTO.getHivStiServicesReq().stream().map(serviceReferredDTO ->servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
+                referral.setSrhReq(referralDTO.getSrhReq().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
+                referral.setSrhAvailed(referralDTO.getSrhAvailed().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
+                referral.setPsychAvailed(referralDTO.getPsychAvailed().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
+                referral.setPsychReq(referralDTO.getPsychReq().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
+                referral.setLaboratoryReq(referralDTO.getLaboratoryReq().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
+                referral.setLaboratoryAvailed(referralDTO.getLaboratoryAvailed().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
+                referral.setTbAvailed(referralDTO.getTbAvailed().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
+                referral.setTbReq(referralDTO.getTbReq().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
+                referral.setOiArtReq(referralDTO.getOiArtReq().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
+                referral.setOiArtAvailed(referralDTO.getOiArtAvailed().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
+                referral.setLegalAvailed(referralDTO.getLegalAvailed().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
+                referral.setLegalReq(referralDTO.getLegalReq().stream().map(serviceReferredDTO -> servicesReferredService.get(serviceReferredDTO.getId())).collect(Collectors.toSet()));
+
+                if(referrals.stream().filter(referral1 ->
+                        referral1.getPatient().getId().equals(referral.getPatient().getId())
+                                && referral1.getReferralDate().toString().equals(formatter.format(referral.getReferralDate()))
+                                && referral1.getHivStiServicesReq().equals(referral.getHivStiServicesReq())
+                                && referral1.getHivStiServicesAvailed().equals(referral.getHivStiServicesAvailed())
+                                && referral1.getSrhAvailed().equals(referral.getSrhAvailed())
+                                && referral1.getSrhReq().equals(referral.getSrhReq())
+                                && referral1.getPsychAvailed().equals(referral.getPsychAvailed())
+                                && referral1.getPsychReq().equals(referral.getPsychReq())
+                                && referral1.getLaboratoryAvailed().equals(referral.getLaboratoryAvailed())
+                                && referral1.getLaboratoryReq().equals(referral.getLaboratoryReq())
+                                && referral1.getTbAvailed().equals(referral.getTbAvailed())
+                                && referral1.getTbReq().equals(referral.getTbReq())
+                                && referral1.getOiArtReq().equals(referral.getOiArtReq())
+                                && referral1.getOiArtAvailed().equals(referral.getOiArtAvailed())
+                                && referral1.getLegalAvailed().equals(referral.getLegalAvailed())
+                                && referral1.getLegalReq().equals(referral.getLegalReq())
+                ).count()<=0){
+                    //all services
+                    try {
+                        Referral newRef=referralService.save(referral);
+                        System.err.println("\n****** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" >>>>>>>>>>>>>> saved referral, via mobile \n");
+                    }catch (DataIntegrityViolationException e){
+                        //dReferrals.add(new DuplicateIndicator(referral.getPatient().getId(), formatter.format(referral.getReferralDate())));
+                        System.err.println("\n***** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" duplicate Referral not saved >>>>>> REf Date;"+referral.getReferralDate()+" \n");
+                    }catch (DataAccessException e){
+                        //dReferrals.add(new DuplicateIndicator(referral.getPatient().getId(), formatter.format(referral.getReferralDate())));
+                        System.err.println("\n***** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" duplicate Referral not saved >>>>>> REf Date;"+referral.getReferralDate()+" \n");
+                    }
+
+                }else{
+                    //dReferrals.add(new DuplicateIndicator(referral.getPatient().getId(), formatter.format(referral.getReferralDate())));
+                    System.err.println("\n***** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" duplicate Referral not saved >>>>>> REf Date;"+referral.getReferralDate()+" \n");
+                }
+            });
+
+            System.err.println("\n****** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" >>>>>>>>>>>>>> saved referrals, via mobile, v2 : "+referralDTOS.size()+"\n");
+
+        } catch (Exception e) {
+            System.err.println("\n\n********************ERROR: user :"+currentUser.getUserName()+" <=> District:"+currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName()+" >>>>>>>>>>>>>> Error::"+e.getMessage()+"\n");
+            response.setCode(500);
+            response.setMessage(e.getMessage());
+            response.setDescription(e.getLocalizedMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/add-mental-health-screening-items")
+    @Transactional(readOnly = true,propagation = Propagation.SUPPORTS)
+    public ResponseEntity<?> addMHScreenings(@RequestBody List<MentalHealthScreeningDTO> mentalHealthScreeningDTOS) {
+        Response response= new Response(200,"Saved successfully!","");
+        //List<DuplicateIndicator> dMHs=new ArrayList<>();
+        User currentUser=userService.getCurrentUser();
+        try {
+            mentalHealthScreeningDTOS.stream().forEach(mentalHealthScreeningDTO -> {
+                Patient patient=patientService.get(mentalHealthScreeningDTO.getPatient());
+                Set<MentalHealthScreening> screenings=mentalHealthScreeningService.findByPatient(patient).stream().collect(Collectors.toSet());
+                MentalHealthScreening mentalHealthScreening=new MentalHealthScreening(mentalHealthScreeningDTO);
+                mentalHealthScreening.setCreatedBy(currentUser);
+                mentalHealthScreening.setDateCreated(new Date());
+                mentalHealthScreening.setPatient(patient);
+                mentalHealthScreening.setActive(true);
+                mentalHealthScreening.setRecordSource(RecordSource.MOBILE_APP);
+                if(screenings.stream().filter(mentalHealthScreening1 ->
+                        mentalHealthScreening1.getPatient().getId().equals(mentalHealthScreening.getPatient().getId())
+                                &&   mentalHealthScreening1.getDateScreened().toString().equals(formatter.format(mentalHealthScreening.getDateScreened()))
+                                && mentalHealthScreening1.getDateCreated().toString().equals(formatter.format(mentalHealthScreening.getDateCreated()))
+                                && mentalHealthScreening1.getRisk().equals(mentalHealthScreening.getRisk())
+                                && ((mentalHealthScreening1.getIdentifiedRisks()==null && mentalHealthScreening.getIdentifiedRisks()==null) || mentalHealthScreening1.getIdentifiedRisks().equals(mentalHealthScreening.getIdentifiedRisks()))
+                ).count()<=0){
+
+
+                    try{
+                        mentalHealthScreeningService.save(mentalHealthScreening);
+                        System.err.println("\n******************** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" >>>>>>>>>>>>>>> saved MH Screening item, via mobile\n");
+                    }catch(DataIntegrityViolationException e){
+                        //dMHs.add(new DuplicateIndicator(mentalHealthScreening.getPatient().getId(), formatter.format(mentalHealthScreening.getDateScreened())));
+                        System.err.println("\n******************** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" duplicate MH Screening not saved >>>>>> Date Screened::"+mentalHealthScreening.getDateScreened()+" **** "+e.getMessage()+"\n\n");
+                    } catch(DataAccessException e){
+                        //dMHs.add(new DuplicateIndicator(mentalHealthScreening.getPatient().getId(), formatter.format(mentalHealthScreening.getDateScreened())));
+                        System.err.println("\n******************** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" duplicate MH Screening not saved >>>>>> Date Screened::"+mentalHealthScreening.getDateScreened()+" **** "+e.getMessage()+"\n\n");
+                    }
+
+                }else{
+                    //dMHs.add(new DuplicateIndicator(mentalHealthScreening.getPatient().getId(), formatter.format(mentalHealthScreening.getDateScreened())));
+                    System.err.println("\n******************** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" duplicate MH Screening not saved >>>>>> Date Screened::"+mentalHealthScreening.getDateScreened()+"\n\n");
+                }
+
+            });
+
+
+            System.err.println("\n******************** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" >>>>>>>>>>>>>>> saved MH Screening items, via mobile, v2, ::"+mentalHealthScreeningDTOS.size()+"\n\n");
+
+            } catch (Exception e) {
+            System.err.println("\n\n******************** ERROR=> user :"+currentUser.getUserName()+" <=> District:"+currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName()+" >>>>>>>> Error::"+e.getMessage()+"\n");
+
+            response.setCode(500);
+            response.setMessage(e.getMessage());
+            response.setDescription(e.getLocalizedMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/add-tb-tpt-screening-items")
+    @Transactional(readOnly = true,propagation = Propagation.SUPPORTS)
+    public ResponseEntity<?> addTBScreenings(@RequestBody List<TbTPTDTO> tbTPTDTOS) {
+
+        //List<DuplicateIndicator> dTBs=new ArrayList<>();
+        User currentUser=userService.getCurrentUser();
+        Response response= new Response(200,"Saved successfully!", "");
+        try {
+            tbTPTDTOS.stream().forEach(tbTPTDTO -> {
                 Patient patient=patientService.get(tbTPTDTO.getPatient());
-                Set<TbIpt> tbIpts=patient.getTbIpts();
+                Set<TbIpt> tbIpts=tbIptService.getByPatient(patient).stream().collect(Collectors.toSet());
+
+
 
                 TbIpt tbIpt=new TbIpt(tbTPTDTO);
+
+                //System.err.println("TB/IPT ITEM::"+tbIpt.toString());
+
                 tbIpt.setCreatedBy(currentUser);
                 tbIpt.setDateCreated(new Date());
                 tbIpt.setPatient(patient);
-                tbIpt.setActive(true);
+                tbIpt.setActive(Boolean.TRUE);
                 tbIpt.setRecordSource(RecordSource.MOBILE_APP);
-                if(tbIpts.stream().filter(tbIpt1 -> tbIpt1.getDateScreened().toString().equals(formatter.format(tbIpt.getDateScreened()))).count()<=0){
-                    TbIpt tbIpt1=tbIptService.save(tbIpt);
-                    System.err.println("\n********************  user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> saved, via mobile, TB Screening items :"+tbTPTDTOS.size()+"\n\n");
+                if(tbIpts.stream().filter(tbIpt1 ->
+                        tbIpt1.getPatient().getId().equals(tbIpt.getPatient().getId())
+                                && tbIpt1.getDateScreened().toString().equals(formatter.format(tbIpt.getDateScreened()))
+                                && tbIpt1.getDateCreated().toString().equals(formatter.format(tbIpt.getDateCreated()))
+                                && tbIpt1.getIdentifiedWithTb().equals(tbIpt.getIdentifiedWithTb())
+                                && ((tbIpt1.getTbSymptoms()==null && tbIpt.getTbSymptoms()==null) || tbIpt1.getTbSymptoms().equals(tbIpt.getTbSymptoms()))
+                                && ((tbIpt1.getEligibleForIpt()==null && tbIpt.getEligibleForIpt()==null) ||tbIpt1.getEligibleForIpt().equals(tbIpt.getEligibleForIpt()))
+                                && ((tbIpt1.getOnIpt()==null && tbIpt.getOnIpt()==null) ||tbIpt1.getOnIpt().equals(tbIpt.getOnIpt()))
+                                && ((tbIpt1.getOnTBTreatment()==null && tbIpt.getOnTBTreatment()==null) || tbIpt1.getOnTBTreatment().equals(tbIpt.getOnTBTreatment()))
+                ).count()<=0){
+                    // signs available, which ones, tpt eligibility, onTPT, onTreatment
+
+                    try{
+                        TbIpt tbIpt1=tbIptService.save(tbIpt);
+                        System.err.println("\n*********  user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> saved TB Screening item \n");
+                    }catch(DataIntegrityViolationException e){
+                        //dTBs.add(new DuplicateIndicator(tbIpt.getPatient().getId(), formatter.format(tbIpt.getDateScreened())));
+                        System.err.println("\n******** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" duplicate TB Screening not saved >>>>>> Date Screened::"+tbIpt.getDateScreened()+"\n");
+                    }catch (DataAccessException e){
+                        //dTBs.add(new DuplicateIndicator(tbIpt.getPatient().getId(), formatter.format(tbIpt.getDateScreened())));
+                        System.err.println("\n*********** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" duplicate TB Screening not saved >>>>>> Date Screened::"+tbIpt.getDateScreened()+"\n");
+                    }
                 }else{
-                    System.err.println("\n******************** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" duplicate TB Screening not saved >>>>>> Date Screened::"+tbIpt.getDateScreened()+"\n\n");
+                    //dTBs.add(new DuplicateIndicator(tbIpt.getPatient().getId(), formatter.format(tbIpt.getDateScreened())));
+                    System.err.println("\n********** user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" duplicate TB Screening not saved >>>>>> Date Screened::"+tbIpt.getDateScreened()+"\n");
                 }
+            });
 
+            System.err.println("\n>>>>>>>>>>>>>>>  user :"+currentUser.getUserName()+" <=> District:"+(currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName())+" TB Screening Items, v2 ::"+tbTPTDTOS.size()+"\n");
 
-            }
-            } catch (Exception e) {
-            System.err.println("\n\n******************** ERROR=> user :"+currentUser.getUserName()+" <=> District:"+currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName()+" >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
-            e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("\n\n******************** ERROR=> user :"+currentUser.getUserName()+" <=> District:"+currentUser.getUserLevel()!=null?currentUser.getDistrict(): catDetailService.getByEmail(currentUser.getUserName()).getPrimaryClinic().getDistrict().getName()+" >>>>>>>>>>>>>>>>> Error::"+e.getMessage()+"\n");
             response.setCode(500);
             response.setMessage(e.getMessage());
             response.setDescription(e.getLocalizedMessage());
@@ -675,6 +801,7 @@ public class MobilePatientResource {
     }
 
     @PostMapping("/add-messages")
+    @Transactional(readOnly = true,propagation = Propagation.SUPPORTS)
     public ResponseEntity<?> addMesssages(@RequestBody MessageDTO messageDTO){
         Response response=new Response(200,"Saved successfully","");
         try {
@@ -702,6 +829,7 @@ public class MobilePatientResource {
     }
 
     @PostMapping("/add-features-request")
+    @Transactional(readOnly = true,propagation = Propagation.SUPPORTS)
     public ResponseEntity<?> addFeatureRequest(@RequestBody FeatureRequestDTO featureRequestDTO){
         Response response=new Response(200,"Saved successfully","");
         try {
@@ -728,6 +856,7 @@ public class MobilePatientResource {
     }
 
     @PostMapping("/add-bug-reports")
+    @Transactional(readOnly = true,propagation = Propagation.SUPPORTS)
     public ResponseEntity<?> addBugReports(@RequestBody BugReportDTO bugReportDTO){
         Response response=new Response(200,"Saved successfully","");
         try {
@@ -763,7 +892,6 @@ public class MobilePatientResource {
         List<BugReportDTO> bugReports=new ArrayList<>();
         try {
             User user=userService.getCurrentUser();
-            System.err.println("ALL : "+all);
             List<BugReport> bugReports1=bugReportService.getAllByCreatedBy(user);
             for(BugReport bugReport: bugReports1){
                 bugReports.add(new BugReportDTO(bugReport));
@@ -848,7 +976,7 @@ public class MobilePatientResource {
 
             facilityStatsDTO=new FacilityStatsDTO(patients.size(),contacts.size(),MHScreenings.size(), TBscreenings.size(), referrals.size(), vls.size());
 
-            System.err.println("\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> "+user.getUserName()+" pulled Facility Managements Data  :"+facilityService.get(facilityID).getName()+"\n\n");
+            System.err.println("\n >>>>>>>>>> "+user.getUserName()+" pulled Facility Managements Data  :"+facilityService.get(facilityID).getName()+", v2\n");
         } catch (Exception e) {
             e.printStackTrace();
             response.setCode(500);
@@ -883,7 +1011,7 @@ public class MobilePatientResource {
 
             facilityRecords=DistrictStatsDTO.createFacilityRecordsList(facilities, patients, contacts, MHScreenings, TBscreenings, referrals, vls);
 
-            System.err.println("\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> "+user.getUserName()+" pulled District Managements Data  :"+districtService.get(districtId).getName()+"\n\n");
+            System.err.println("\n >>>>>>>>>>> "+user.getUserName()+" pulled District Managements Data  :"+districtService.get(districtId).getName()+", v2\n");
         } catch (Exception e) {
             e.printStackTrace();
             response.setCode(500);
@@ -895,12 +1023,5 @@ public class MobilePatientResource {
         return new ResponseEntity<>(facilityRecords, HttpStatus.OK);
     }
 
-    private boolean sameChars(String firstStr, String secondStr) {
-        char[] first = firstStr.toCharArray();
-        char[] second = secondStr.toCharArray();
-        Arrays.sort(first);
-        Arrays.sort(second);
-        return Arrays.equals(first, second);
-    }
 
 }

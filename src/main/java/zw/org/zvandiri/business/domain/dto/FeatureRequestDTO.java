@@ -6,6 +6,7 @@ import zw.org.zvandiri.business.domain.util.FeaturePlatform;
 import zw.org.zvandiri.business.util.dto.UserDTO;
 
 import javax.persistence.Enumerated;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Date;
  */
 
 
-public class FeatureRequestDTO  {
+public class FeatureRequestDTO  implements Serializable {
     private String id;
     private String feature;
     private String purpose;

@@ -15,11 +15,7 @@
  */
 package zw.org.zvandiri.business.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.Index;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import lombok.ToString;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -33,11 +29,11 @@ import zw.org.zvandiri.business.domain.util.YesNo;
  * @author Judge Muzinda
  */
 @Entity 
-/*@Table(indexes = {
+@Table(indexes = {
 		@Index(name = "investigation_test_patient", columnList = "patient"),
 		@Index(name = "investigation_test_dateTaken", columnList = "dateTaken"),
-})*/
-@ToString
+        @Index(name = "investigation_test_creator", columnList = "created_by"),
+})
 public class InvestigationTest extends TestResult {
 
     @Enumerated

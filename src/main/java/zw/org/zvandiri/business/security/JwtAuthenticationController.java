@@ -15,12 +15,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import zw.org.zvandiri.business.domain.User;
+import zw.org.zvandiri.business.domain.dto.UserDTO;
+import zw.org.zvandiri.business.security.JwtRequest;
+import zw.org.zvandiri.business.security.JwtTokenUtil;
 import zw.org.zvandiri.business.security.provider.UserDetailsServiceImpl;
+import zw.org.zvandiri.business.service.CatDetailService;
 import zw.org.zvandiri.business.service.UserService;
 
-/**
- * @author manatsachinyeruse@gmail.com
- */
+import java.util.Date;
+
+
 
 @RestController
 @CrossOrigin
@@ -38,16 +42,17 @@ public class JwtAuthenticationController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    CatDetailService catDetailService;
+
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
-
-        System.err.println(authenticationRequest);
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
-
         final UserDetails userDetails = userDetailsService
                 .loadUserByUsername(authenticationRequest.getUsername());
 
         final String token = jwtTokenUtil.generateToken(userDetails);
+        System.err.println(authenticationRequest.getUsername()+" has logged in.........> Date: "+new Date());
         return ResponseEntity.ok(token);
     }
 

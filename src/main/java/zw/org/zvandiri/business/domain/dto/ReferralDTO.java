@@ -7,6 +7,7 @@ import zw.org.zvandiri.business.domain.Referral;
 import zw.org.zvandiri.business.domain.ServicesReferred;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,7 +17,7 @@ import java.util.Set;
  */
 
 
-public class ReferralDTO {
+public class ReferralDTO implements Serializable {
     private String id;
     private String patient;
     @Temporal(TemporalType.DATE)

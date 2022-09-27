@@ -11,6 +11,7 @@ import zw.org.zvandiri.business.domain.util.YesNo;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -18,7 +19,7 @@ import java.util.Date;
  */
 
 
-public class VLCD4DTO {
+public class VLCD4DTO implements Serializable {
     private String id;
     private String patient;
     @Temporal(TemporalType.DATE)

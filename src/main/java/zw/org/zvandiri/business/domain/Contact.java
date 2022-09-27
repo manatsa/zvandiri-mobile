@@ -20,8 +20,11 @@ import javax.annotation.Resource;
 import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import zw.org.zvandiri.business.domain.dto.ContactDTO;
@@ -37,19 +40,23 @@ import zw.org.zvandiri.business.service.*;
  *
  * @author Judge Muzinda
  */
-@ToString
-@Entity @JsonIgnoreProperties(ignoreUnknown = true)
+@Entity
+//@EqualsAndHashCode(exclude = "nameAttributeInThisClassWithOneToMany")
 @Table(indexes = {
 		@Index(name = "contact_patient", columnList = "patient"),
 		@Index(name = "contact_contact_date", columnList = "contactDate"),
 		@Index(name = "contact_location", columnList = "location"),
 		@Index(name = "contact_position", columnList = "position")
-})
+}
+/*,
+        uniqueConstraints={
+        @UniqueConstraint(columnNames = {"patient", "contact_date"})
+}*/
+)
 public class Contact extends BaseEntity {
-
-
     @JsonIgnore
     @ManyToOne
+    @Fetch(value= FetchMode.SELECT)
     @JoinColumn(name="patient")
     private Patient patient;
     @Temporal(TemporalType.DATE)
@@ -75,31 +82,31 @@ public class Contact extends BaseEntity {
     @JoinColumn(name="position")
     private Position position;
     @JsonIgnore
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @JoinTable(name = "contact_lab_service", joinColumns = {
         @JoinColumn(name = "contact_id", nullable = false)}, inverseJoinColumns = {
         @JoinColumn(name = "lab_service_id", nullable = false)})
     private Set<LabTask> labTasks = new HashSet<>();
     @JsonIgnore
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @JoinTable(name = "contact_clinical_assessment", joinColumns = {
         @JoinColumn(name = "contact_id", nullable = false)}, inverseJoinColumns = {
         @JoinColumn(name = "assessment_id", nullable = false)})
     private Set<Assessment> clinicalAssessments = new HashSet<>();
     @JsonIgnore
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @JoinTable(name = "contact_non_clinical_assessment", joinColumns = {
         @JoinColumn(name = "contact_id", nullable = false)}, inverseJoinColumns = {
         @JoinColumn(name = "assessment_id", nullable = false)})
     private Set<Assessment> nonClinicalAssessments = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @JoinTable(name = "contact_service_offered", joinColumns = {
         @JoinColumn(name = "contact_id", nullable = false)}, inverseJoinColumns = {
         @JoinColumn(name = "service_offered_id", nullable = false)})
     private Set<ServiceOffered> serviceOffereds = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @JoinTable(name = "contact_service_offered", joinColumns = {
             @JoinColumn(name = "contact_id", nullable = false)}, inverseJoinColumns = {
             @JoinColumn(name = "service_offered_id", nullable = false)})
@@ -376,4 +383,17 @@ public class Contact extends BaseEntity {
                 ", SystemDeterminedCareLevel = "+systemDeterminedCareLevel+"}");
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Contact contact = (Contact) o;
+        return patient.equals(contact.patient) && contactDate.equals(contact.contactDate) && location.equals(contact.getLocation()) && contactMadeBy.equals(contact.contactMadeBy);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), patient, contactDate,location, contactMadeBy);
+    }
 }

@@ -3,12 +3,14 @@ package zw.org.zvandiri.business.domain.dto;
 
 import zw.org.zvandiri.business.domain.Education;
 
+import java.io.Serializable;
+
 /**
  * @author manatsachinyeruse@gmail.com
  */
 
 
-public class EducationDTO {
+public class EducationDTO implements Serializable {
     private String id;
     private String name;
 

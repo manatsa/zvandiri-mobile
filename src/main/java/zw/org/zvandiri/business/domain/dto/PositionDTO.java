@@ -3,12 +3,14 @@ package zw.org.zvandiri.business.domain.dto;
 
 import zw.org.zvandiri.business.domain.Position;
 
+import java.io.Serializable;
+
 /**
  * @author manatsachinyeruse@gmail.com
  */
 
 
-public class PositionDTO {
+public class PositionDTO implements Serializable {
     private String id;
     private String name;
 

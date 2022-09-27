@@ -7,6 +7,8 @@ package zw.org.zvandiri.business.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.ToString;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import zw.org.zvandiri.business.domain.dto.MentalHealthScreeningDTO;
@@ -24,16 +26,17 @@ import java.util.Set;
  * @author tasu
  */
 @Entity 
-/*@Table(indexes = {
-		@Index(name = "mental_health_screening_patient", columnList = "patient")
-})*/
-
-@ToString
+@Table(indexes = {
+		@Index(name = "mental_health_screening_patient", columnList = "patient"),
+        @Index(name = "mental_health_screening_date_screened", columnList = "dateScreened"),
+        @Index(name = "mental_health_screening_creator", columnList = "created_by"),
+})
 public class MentalHealthScreening extends BaseEntity {
 
     @ManyToOne(optional = false)
     @JsonIgnore
     @NotNull
+    @Fetch(value= FetchMode.SELECT)
     @JoinColumn(name="patient")
     private Patient patient;
     @Enumerated

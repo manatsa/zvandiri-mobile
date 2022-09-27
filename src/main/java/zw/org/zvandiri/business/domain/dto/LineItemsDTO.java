@@ -3,6 +3,7 @@ package zw.org.zvandiri.business.domain.dto;
 
 import zw.org.zvandiri.business.domain.*;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -10,7 +11,7 @@ import java.util.List;
  */
 
 
-public class LineItemsDTO {
+public class LineItemsDTO implements Serializable {
     List<PatientDTO> patients;
     List<ContactDTO> contacts;
     List<MentalHealthScreeningDTO> mentalHealthScreenings;

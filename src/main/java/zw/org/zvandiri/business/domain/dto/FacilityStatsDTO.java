@@ -1,12 +1,14 @@
 package zw.org.zvandiri.business.domain.dto;
 
 
+import java.io.Serializable;
+
 /**
  * @author manatsachinyeruse@gmail.com
  */
 
 
-public class FacilityStatsDTO {
+public class FacilityStatsDTO implements Serializable {
     private Integer patients;
     private Integer contacts;
     private Integer mhScreenings;

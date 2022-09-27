@@ -3,12 +3,14 @@ package zw.org.zvandiri.business.domain.dto;
 
 import zw.org.zvandiri.business.domain.SupportGroup;
 
+import java.io.Serializable;
+
 /**
  * @author manatsachinyeruse@gmail.com
  */
 
 
-public class SupportGroupDTO {
+public class SupportGroupDTO implements Serializable {
     private String id;
     private String district;
     private String name;

@@ -3,12 +3,14 @@ package zw.org.zvandiri.business.domain.dto;
 
 import zw.org.zvandiri.business.domain.Relationship;
 
+import java.io.Serializable;
+
 /**
  * @author manatsachinyeruse@gmail.com
  */
 
 
-public class RelationshipDTO {
+public class RelationshipDTO implements Serializable {
     private String id;
     private String name;
 

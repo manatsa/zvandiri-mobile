@@ -4,6 +4,7 @@ package zw.org.zvandiri.controllers;
 import zw.org.zvandiri.business.domain.BaseEntity;
 import zw.org.zvandiri.business.domain.BaseName;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -11,7 +12,7 @@ import java.util.List;
  */
 
 
-public class Response {
+public class Response implements Serializable {
     private int code;
     private BaseEntity baseEntity;
     private List<BaseEntity> baseEntities;

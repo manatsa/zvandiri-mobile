@@ -26,7 +26,7 @@ import zw.org.zvandiri.business.domain.util.ReferalType;
  *
  * @author Judge Muzinda
  */
-@Entity @JsonIgnoreProperties(ignoreUnknown = true)
+@Entity
 public class ServicesReferred extends BaseName {
 
     @Enumerated

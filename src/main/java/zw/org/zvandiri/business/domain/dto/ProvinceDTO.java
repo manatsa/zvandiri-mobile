@@ -3,12 +3,14 @@ package zw.org.zvandiri.business.domain.dto;
 
 import zw.org.zvandiri.business.domain.Province;
 
+import java.io.Serializable;
+
 /**
  * @author manatsachinyeruse@gmail.com
  */
 
 
-public class ProvinceDTO {
+public class ProvinceDTO implements Serializable {
     private String id;
     private String name;
 

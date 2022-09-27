@@ -8,6 +8,8 @@ package zw.org.zvandiri.business.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.ToString;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.format.annotation.DateTimeFormat;
 import zw.org.zvandiri.business.domain.dto.TbTPTDTO;
 import zw.org.zvandiri.business.domain.util.TbIdentificationOutcome;
@@ -15,23 +17,25 @@ import zw.org.zvandiri.business.domain.util.TbSymptom;
 import zw.org.zvandiri.business.domain.util.YesNo;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
 /**
- *
  * @author tasu
  */
-@Entity @JsonIgnoreProperties(ignoreUnknown = true)
-/*@Table(indexes = {
-		@Index(name = "tb_ipt_patient", columnList = "patient"),
-		@Index(name = "tb_ipt_created_by", columnList = "created_by")
-})*/
-@ToString()
-public class TbIpt extends BaseEntity {
+@Entity
+@Table(indexes = {
+        @Index(name = "tb_ipt_patient", columnList = "patient"),
+        @Index(name = "tb_ipt_date_screened", columnList = "dateScreened"),
+        @Index(name = "tb_ipt_created_by", columnList = "created_by")
+})
+
+public class TbIpt extends BaseEntity implements Serializable {
 
     @ManyToOne
-    @JoinColumn(name="patient")
+    @Fetch(value= FetchMode.SELECT)
+    @JoinColumn(name = "patient")
     private Patient patient;
     @Enumerated
     private YesNo screenedForTb;
@@ -90,8 +94,6 @@ public class TbIpt extends BaseEntity {
     /*private String referralForSputum;
     @Enumerated
     private TbTreatmentOutcome tbTreatmentOutcome;*/
-
-
 
 
     public TbIpt() {
@@ -292,16 +294,16 @@ public class TbIpt extends BaseEntity {
     }
 
     public String getSymptoms() {
-        if(tbSymptoms.isEmpty()){
+        if (tbSymptoms.isEmpty()) {
             return "";
         }
         StringBuilder r = new StringBuilder();
         int pos = 1;
-        for(TbSymptom role : tbSymptoms){
-            if(pos < tbSymptoms.size()) {
+        for (TbSymptom role : tbSymptoms) {
+            if (pos < tbSymptoms.size()) {
                 r.append(role.getName());
                 r.append(" ,");
-            }else{
+            } else {
                 r.append(role.getName());
             }
             pos++;
@@ -309,12 +311,12 @@ public class TbIpt extends BaseEntity {
         return r.toString();
     }
 
-	@Override
-	public String toString() {
-		return "TbIpt [patient=" + patient + ", screenedForTb=" + screenedForTb + ", dateScreened=" + dateScreened
-				+ ", tbSymptoms=" + tbSymptoms + ", identifiedWithTb=" + identifiedWithTb + ", tbIdentificationOutcome="
-				+ tbIdentificationOutcome + ", dateStartedTreatment=" + dateStartedTreatment  + ", referredForIpt="
-				+ referredForIpt + ", onIpt=" + onIpt + ", dateStartedIpt=" + dateStartedIpt + "]";
-	}
-    
+    @Override
+    public String toString() {
+        return "TbIpt [patient=" + patient + ", screenedForTb=" + screenedForTb + ", dateScreened=" + dateScreened
+                + ", tbSymptoms=" + tbSymptoms + ", identifiedWithTb=" + identifiedWithTb + ", tbIdentificationOutcome="
+                + tbIdentificationOutcome + ", dateStartedTreatment=" + dateStartedTreatment + ", referredForIpt="
+                + referredForIpt + ", onIpt=" + onIpt + ", dateStartedIpt=" + dateStartedIpt + "]";
+    }
+
 }

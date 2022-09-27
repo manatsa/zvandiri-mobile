@@ -3,12 +3,14 @@ package zw.org.zvandiri.business.domain.dto;
 
 import zw.org.zvandiri.business.domain.ReasonForNotReachingOLevel;
 
+import java.io.Serializable;
+
 /**
  * @author manatsachinyeruse@gmail.com
  */
 
 
-public class ReasonForNotReachingOLvelDTO {
+public class ReasonForNotReachingOLvelDTO implements Serializable {
     private String id;
     private String name;
 

@@ -400,12 +400,7 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     public List<Patient> getFacilityPatients(CatDetail catdDetail) {
-        System.err.println(">>>>>> Primary Clinic : "+catdDetail.getPrimaryClinic());
         List<Patient> patients=patientRepo.getAllByPrimaryClinicAndActive(catdDetail.getPrimaryClinic(), true);
-        /*List<MobilePatientDTO> mobilePatientDTOS=new ArrayList<>();
-        for(Patient p: patients){
-            mobilePatientDTOS.add(new MobilePatientDTO(p));
-        }*/
         return patients;
     }
 

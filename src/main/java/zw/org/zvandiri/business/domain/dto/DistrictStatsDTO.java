@@ -3,6 +3,7 @@ package zw.org.zvandiri.business.domain.dto;
 
 import zw.org.zvandiri.business.domain.*;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
  */
 
 
-public class DistrictStatsDTO {
+public class DistrictStatsDTO implements Serializable {
     private List<FacilityRecord> facilityRecord;
 
     public DistrictStatsDTO() {

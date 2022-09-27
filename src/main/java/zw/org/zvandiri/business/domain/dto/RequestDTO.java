@@ -5,6 +5,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import zw.org.zvandiri.business.domain.District;
 import zw.org.zvandiri.business.domain.Facility;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -13,7 +14,7 @@ import java.util.List;
  */
 
 
-public class RequestDTO {
+public class RequestDTO implements Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     Date startDate;
 

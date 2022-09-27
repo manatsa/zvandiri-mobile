@@ -19,22 +19,12 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import lombok.ToString;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import zw.org.zvandiri.business.domain.dto.ReferralDTO;
@@ -45,15 +35,15 @@ import zw.org.zvandiri.business.domain.util.YesNo;
  *
  * @author Judge Muzinda
  */
-@ToString
 @Entity
-/*@Table(indexes = {
+@Table(indexes = {
 		@Index(name = "referral_patient", columnList = "patient"),
 		@Index(name = "referral_referral_date", columnList = "referralDate")
-})*/
+})
 public class Referral extends BaseEntity {
 
     @ManyToOne
+    @Fetch(value= FetchMode.SELECT)
     @JoinColumn(name="patient")
     private Patient patient;
     @Temporal(TemporalType.DATE)
@@ -81,78 +71,78 @@ public class Referral extends BaseEntity {
     private YesNo hasReferred;
     @Enumerated
     private ReferralActionTaken actionTaken;
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "referral_hiv_sti_req", joinColumns = {
         @JoinColumn(name = "referral_id", nullable = false)}, inverseJoinColumns = {
         @JoinColumn(name = "hiv_sti_id", nullable = false)})
     private Set<ServicesReferred> hivStiServicesReq = new HashSet<>();
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "referral_hiv_sti_availed", joinColumns = {
         @JoinColumn(name = "referral_id", nullable = false)}, inverseJoinColumns = {
         @JoinColumn(name = "hiv_sti_id", nullable = false)})
     private Set<ServicesReferred> hivStiServicesAvailed = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "referral_oi_art_req", joinColumns = {
         @JoinColumn(name = "referral_id", nullable = false)}, inverseJoinColumns = {
         @JoinColumn(name = "oi_arti_id", nullable = false)})
     private Set<ServicesReferred> oiArtReq = new HashSet<>();
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "referral_oi_art_availed", joinColumns = {
         @JoinColumn(name = "referral_id", nullable = false)}, inverseJoinColumns = {
         @JoinColumn(name = "oi_art_id", nullable = false)})
     private Set<ServicesReferred> oiArtAvailed = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "referral_srh_req", joinColumns = {
         @JoinColumn(name = "referral_id", nullable = false)}, inverseJoinColumns = {
         @JoinColumn(name = "srh_id", nullable = false)})
     private Set<ServicesReferred> srhReq = new HashSet<>();
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "referral_srh_availed", joinColumns = {
         @JoinColumn(name = "referral_id", nullable = false)}, inverseJoinColumns = {
         @JoinColumn(name = "srh_id", nullable = false)})
     private Set<ServicesReferred> srhAvailed = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "referral_laboratory_req", joinColumns = {
         @JoinColumn(name = "referral_id", nullable = false)}, inverseJoinColumns = {
         @JoinColumn(name = "laboratory_id", nullable = false)})
     private Set<ServicesReferred> laboratoryReq = new HashSet<>();
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "referral_laboratory_availed", joinColumns = {
         @JoinColumn(name = "referral_id", nullable = false)}, inverseJoinColumns = {
         @JoinColumn(name = "laboratory_id", nullable = false)})
     private Set<ServicesReferred> laboratoryAvailed = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "referral_tb_req", joinColumns = {
         @JoinColumn(name = "referral_id", nullable = false)}, inverseJoinColumns = {
         @JoinColumn(name = "tb_id", nullable = false)})
     private Set<ServicesReferred> tbReq = new HashSet<>();
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "referral_tb_availed", joinColumns = {
         @JoinColumn(name = "referral_id", nullable = false)}, inverseJoinColumns = {
         @JoinColumn(name = "tb_id", nullable = false)})
     private Set<ServicesReferred> tbAvailed = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "referral_psych_req", joinColumns = {
         @JoinColumn(name = "referral_id", nullable = false)}, inverseJoinColumns = {
         @JoinColumn(name = "psych_id", nullable = false)})
     private Set<ServicesReferred> psychReq = new HashSet<>();
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "referral_psychb_availed", joinColumns = {
         @JoinColumn(name = "referral_id", nullable = false)}, inverseJoinColumns = {
         @JoinColumn(name = "psych_id", nullable = false)})
     private Set<ServicesReferred> psychAvailed = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "referral_legal_req", joinColumns = {
         @JoinColumn(name = "referral_id", nullable = false)}, inverseJoinColumns = {
         @JoinColumn(name = "legal_id", nullable = false)})
     private Set<ServicesReferred> legalReq = new HashSet<>();
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "referral_legalb_availed", joinColumns = {
         @JoinColumn(name = "referral_id", nullable = false)}, inverseJoinColumns = {
         @JoinColumn(name = "legal_id", nullable = false)})

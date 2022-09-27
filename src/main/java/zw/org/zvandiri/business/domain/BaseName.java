@@ -21,12 +21,14 @@ import javax.persistence.Transient;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import zw.org.zvandiri.business.util.StringUtils;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Judge Muzinda
  */
 @MappedSuperclass
-abstract public class BaseName extends BaseEntity {
+abstract public class BaseName extends BaseEntity implements Serializable {
 
     private String name;
     @JsonIgnore
@@ -46,11 +48,6 @@ abstract public class BaseName extends BaseEntity {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return name;
     }
 
     public String getDescription() {
@@ -101,5 +98,13 @@ abstract public class BaseName extends BaseEntity {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "BaseName{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                '}';
     }
 }

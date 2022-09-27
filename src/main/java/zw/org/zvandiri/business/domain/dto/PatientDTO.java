@@ -7,6 +7,7 @@ import zw.org.zvandiri.business.domain.*;
 import zw.org.zvandiri.business.domain.util.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -14,7 +15,7 @@ import java.util.Date;
  */
 
 
-public class PatientDTO {
+public class PatientDTO implements Serializable {
     private String id;
     @Enumerated
     private YesNo haveBirthCertificate;

@@ -13,6 +13,7 @@ import zw.org.zvandiri.business.domain.util.YesNo;
 import javax.persistence.Enumerated;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
  * @author manatsachinyeruse@gmail.com
  */
 
-public class ContactDTO {
+public class ContactDTO implements Serializable {
 
     private String id;
     private String patient;

@@ -4,12 +4,14 @@ package zw.org.zvandiri.business.domain.dto;
 import zw.org.zvandiri.business.domain.District;
 import zw.org.zvandiri.business.domain.Facility;
 
+import java.io.Serializable;
+
 /**
  * @author manatsachinyeruse@gmail.com
  */
 
 
-public class FacilityDTO {
+public class FacilityDTO implements Serializable {
     private String id;
     private String name;
     private String district;

@@ -17,6 +17,7 @@ package zw.org.zvandiri.business.service.impl;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Repository;
@@ -53,7 +54,8 @@ public class FacilityServiceImpl implements FacilityService {
         if (id == null) {
             throw new IllegalStateException("Item to be does not exist");
         }
-        return facilityRepo.findById(id).get();
+        Optional<Facility> facilityOptional=facilityRepo.findById(id);
+        return facilityOptional.isPresent()?facilityOptional.get():null;
     }
 
     @Override

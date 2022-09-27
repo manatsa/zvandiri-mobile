@@ -13,6 +13,7 @@ import zw.org.zvandiri.business.domain.util.TbSymptom;
 import zw.org.zvandiri.business.domain.util.YesNo;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
@@ -21,7 +22,7 @@ import java.util.Set;
  */
 
 @ToString()
-public class TbTPTDTO {
+public class TbTPTDTO implements Serializable {
 
     private String id;
     @ManyToOne

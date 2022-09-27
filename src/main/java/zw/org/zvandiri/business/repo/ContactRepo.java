@@ -51,6 +51,11 @@ public interface ContactRepo extends JpaRepository<Contact, String> {
     public List<Contact> findByFacilityAndContactDates(
             @Param("facility") Facility facility,
             @Param("start") Date start, @Param("end") Date end);
+
+    @Query("Select Distinct(c) from Contact c left join fetch c.clinicalAssessments left join fetch c.nonClinicalAssessments left join  fetch  c.patient p where p.primaryClinic.district=:district and (c.contactDate) between :start and :end order by  p.lastName ASC, p.firstName ASC, c.dateCreated DESC")
+    public List<Contact> findByDistrictAndContactDates(
+            @Param("district") District district,
+            @Param("start") Date start, @Param("end") Date end);
     
     @Query("Select Distinct(c) from Contact c left join fetch c.patient left join fetch c.location left join fetch c.position left join fetch c.clinicalAssessments left join fetch c.nonClinicalAssessments")
     public List<Contact> findByAllContacts();
@@ -71,6 +76,9 @@ public interface ContactRepo extends JpaRepository<Contact, String> {
 
     @Query("select distinct  c from Contact c where c.patient.primaryClinic.district.id=:district and c.dateCreated between  :start and :end ")
     List<Contact> findByDistrictInGivenTime(@RequestParam("start") Date start, @RequestParam("end") Date end, @RequestParam("district") String district);
+
+    @Query("select distinct  c from Contact c left join fetch c.patient left  join  c.position left join fetch c.location where c.patient.id=:patient and c.contactDate=:contactDate and c.contactMadeBy=:contactMadeBy and c.location.id=:location")
+    List<Contact> getDuplicateContacts(@Param("patient") String patient, @Param("contactDate") String contactDate, @Param("contactMadeBy") String contactMadeBy, @Param("location") String location);
 
 
 }

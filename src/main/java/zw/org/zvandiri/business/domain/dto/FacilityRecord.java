@@ -1,12 +1,14 @@
 package zw.org.zvandiri.business.domain.dto;
 
 
+import java.io.Serializable;
+
 /**
  * @author manatsachinyeruse@gmail.com
  */
 
 
-public class FacilityRecord{
+public class FacilityRecord implements Serializable {
     private String facility;
     private Integer patients;
     private Integer contacts;

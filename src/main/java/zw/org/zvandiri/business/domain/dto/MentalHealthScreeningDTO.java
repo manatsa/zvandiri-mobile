@@ -12,6 +12,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Enumerated;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
@@ -21,7 +22,7 @@ import java.util.Set;
 
 
 @ToString
-public class MentalHealthScreeningDTO {
+public class MentalHealthScreeningDTO implements Serializable {
     private String id;
     private String patient;
     @Enumerated

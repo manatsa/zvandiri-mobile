@@ -40,6 +40,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
 
+    @Override
+    protected ResponseEntity<Object> handleConversionNotSupported(ConversionNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        String error = "Failed to convert Error.";
+        User user=userService.getCurrentUser();
+        System.err.println("\n\nUser :: "+user.getUserName()+" <=> District:"+(user.getUserLevel()!=null?user.getDistrict(): catDetailService.getByEmail(user.getUserName()).getPrimaryClinic().getDistrict().getName())+" >>>>>>> BAD REQUEST ISSUED >>>>>>> Message :: "+ex.getMessage());
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, error, ex));
+    }
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());

@@ -62,7 +62,6 @@ public class Facility extends BaseName {
     @Override
     public String toString() {
         return "Facility{" +
-                "id="+getId()+
                 "name="+getName()+
                 "district=" + district.getName() +
                 '}';
